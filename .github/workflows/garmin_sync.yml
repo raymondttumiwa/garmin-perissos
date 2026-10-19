@@ -26,5 +26,5 @@ jobs:
           GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          SYNC_DAYS: '130'
+          SYNC_DAYS: '7'
         run: python garmin_sync.py
