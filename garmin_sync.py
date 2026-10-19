@@ -7,11 +7,12 @@ import json
 import time
 import base64
 import tempfile
-from datetime import date, timedelta
+from datetime import datetime, timedelta
+import pytz
 import requests
 from garminconnect import Garmin
 
-# 1. Auto-clean environment variables so trailing slashes or spaces never crash the script
+# Auto-clean environment variables
 RAW_URL = os.environ.get("SUPABASE_URL", "").strip()
 SUPABASE_URL = RAW_URL.split("/rest/v1")[0].rstrip("/")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
@@ -23,18 +24,14 @@ SYNC_DAYS = int(os.environ.get("SYNC_DAYS", "7"))
 
 def validate_env():
     if not SUPABASE_URL.startswith("https://") or ".supabase.co" not in SUPABASE_URL:
-        raise ValueError(
-            f"SUPABASE_URL looks invalid or empty (got: '{RAW_URL}'). "
-            "Check GitHub Settings -> Secrets -> Actions -> SUPABASE_URL."
-        )
+        raise ValueError(f"SUPABASE_URL looks invalid: '{RAW_URL}'")
     if not SUPABASE_KEY:
-        raise ValueError("SUPABASE_SERVICE_KEY secret is empty or missing in GitHub Secrets.")
+        raise ValueError("SUPABASE_SERVICE_KEY is missing in GitHub Secrets.")
 
 
 def login_garmin() -> Garmin:
-    # Method A: If a cached OAuth token exists in GitHub Secrets, use it (bypasses 429 IP rate limits!)
     if GARMIN_TOKEN_B64:
-        print("Restoring Garmin session from GARMIN_TOKEN_BASE64 (bypasses 429 login limits)...")
+        print("Restoring Garmin session from GARMIN_TOKEN_BASE64...")
         token_dir = tempfile.mkdtemp()
         raw_json = base64.b64decode(GARMIN_TOKEN_B64).decode("utf-8")
         data = json.loads(raw_json)
@@ -45,7 +42,6 @@ def login_garmin() -> Garmin:
         client.login(token_dir)
         return client
 
-    # Method B: Standard email/password login with retry backoff
     print("Authenticating with Garmin Connect via email/password...")
     for attempt in range(1, 4):
         try:
@@ -55,14 +51,9 @@ def login_garmin() -> Garmin:
         except Exception as e:
             print(f"Login attempt {attempt}/3 failed: {e}")
             if attempt < 3:
-                wait_sec = attempt * 15
-                print(f"Waiting {wait_sec}s before retry...")
-                time.sleep(wait_sec)
+                time.sleep(attempt * 15)
             else:
-                raise RuntimeError(
-                    "Garmin blocked the GitHub runner IP with HTTP 429. "
-                    "See instructions to add GARMIN_TOKEN_BASE64 to GitHub Secrets."
-                ) from e
+                raise RuntimeError("Garmin rate limited (429).") from e
 
 
 def upsert_to_supabase(row: dict):
@@ -81,7 +72,10 @@ def upsert_to_supabase(row: dict):
 def sync_metrics():
     validate_env()
     garmin = login_garmin()
-    today = date.today()
+
+    # Anchor to local timezone (Asia/Shanghai / UTC+8)
+    local_tz = pytz.timezone("Asia/Shanghai")
+    today = datetime.now(local_tz).date()
 
     for i in range(SYNC_DAYS):
         target_date = (today - timedelta(days=i)).isoformat()
@@ -91,7 +85,7 @@ def sync_metrics():
         sleep_data = garmin.get_sleep_data(target_date) or {}
         daily_sleep = sleep_data.get("dailySleepDTO", {}) or {}
 
-        steps = summary.get("totalSteps") or 0
+        steps = summary.get("totalSteps") or summary.get("steps") or 0
         resting_hr = summary.get("restingHeartRate") or 60
         stress_avg = summary.get("averageStressLevel")
         if stress_avg is None or stress_avg < 0:
@@ -99,6 +93,7 @@ def sync_metrics():
         body_battery = summary.get("bodyBatteryHighestValue") or 80
         active_kcal = summary.get("activeKilocalories") or 0
 
+        # Active minutes extraction with fallbacks
         mod_min = summary.get("moderateIntensityMinutes") or 0
         vig_min = summary.get("vigorousIntensityMinutes") or 0
         active_min = mod_min + (vig_min * 2)
@@ -110,15 +105,38 @@ def sync_metrics():
             or 78
         )
 
+        # Fetch advanced metrics safely (Training Status & Readiness)
+        training_status = "N/A"
+        try:
+            status_data = garmin.get_training_status(target_date)
+            if status_data and isinstance(status_data, list) and len(status_data) > 0:
+                training_status = status_data[0].get("status", "N/A")
+            elif isinstance(status_data, dict):
+                training_status = status_data.get("status", "N/A")
+        except Exception:
+            pass
+
+        training_readiness = 0
+        try:
+            readiness_data = garmin.get_training_readiness(target_date)
+            if readiness_data:
+                training_readiness = readiness_data.get("score", 0)
+        except Exception:
+            pass
+
+        # Activities fetch for workout labeling and active minutes backup
         activities = garmin.get_activities_by_date(target_date, target_date) or []
         workout_label = "Rest / Active Recovery"
+        act_duration_total = 0
         if activities:
             first = activities[0]
             act_name = first.get("activityName", "Workout")
             dur_min = round((first.get("duration") or 0) / 60)
+            act_duration_total = dur_min
             workout_label = f"{act_name} ({dur_min}m)"
-            if active_min == 0 and dur_min > 0:
-                active_min = dur_min
+
+        if active_min == 0 and act_duration_total > 0:
+            active_min = act_duration_total
 
         row = {
             "date": target_date,
@@ -131,10 +149,12 @@ def sync_metrics():
             "stress_avg": int(stress_avg),
             "active_kcal": int(active_kcal),
             "workout_label": workout_label,
+            "training_status": str(training_status),
+            "training_readiness": int(training_readiness),
         }
 
         upsert_to_supabase(row)
-        print(f"  ✓ Synced {target_date}: {steps} steps, {sleep_hours}h sleep ({ workout_label })")
+        print(f"  ✓ Synced {target_date}: {steps} steps, {active_min} active mins, Status: {training_status}")
 
 
 if __name__ == "__main__":
