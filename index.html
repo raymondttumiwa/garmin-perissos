@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooted & Built — Faithful Stewardship & Biometric Rhythm</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter, Fraunces (for warm editorial biblical headers) & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Fraunces', 'Georgia', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.25); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.45); }
+        .bar-grow { transition: height 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+        .check-pop { animation: pop-scale 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes pop-scale {
+            0% { transform: scale(0.8); }
+            60% { transform: scale(1.12); }
+            100% { transform: scale(1); }
+        }
+        .pulse-dot { animation: pulse-ring 2s infinite; }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+    </style>
+</head>
+<body class="bg-stone-100 dark:bg-[#0b101b] text-slate-900 dark:text-stone-100 font-sans min-h-screen transition-colors duration-300 selection:bg-emerald-600 selection:text-white pb-16">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-30 backdrop-blur-xl bg-white/85 dark:bg-[#0f1624]/85 border-b border-stone-200/80 dark:border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+            <!-- Brand & Scripture Tagline -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 via-teal-600 to-amber-500 flex items-center justify-center shadow-lg shadow-emerald-600/20 text-white shrink-0">
+                    <i data-lucide="sprout" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="font-serif font-bold text-base sm:text-xl tracking-tight text-slate-900 dark:text-stone-100">Rooted &amp; Built</h1>
+                        <span class="hidden sm:inline-block text-[11px] font-mono font-semibold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">Colossians 2:7</span>
+                        <button onclick="openCloudModal()" id="sync-status-pill" class="inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 hover:bg-amber-500/20 transition">
+                            <span id="sync-status-dot" class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            <span id="sync-status-text">Local Mode</span>
+                        </button>
+                    </div>
+                    <p id="current-date-label" class="text-[11px] text-slate-500 dark:text-slate-400">Faithful Stewardship • Spiritual Rhythm &amp; Garmin Biometrics</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2">
+                <button onclick="triggerGarminSyncNow()" id="btn-sync-now" title="Sync Garmin biometrics & manual devotions with Supabase" class="px-3 py-2 rounded-xl bg-stone-100 dark:bg-slate-800/90 hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/30 border border-stone-200 dark:border-slate-700/80 text-xs font-semibold transition flex items-center gap-1.5">
+                    <i id="sync-now-icon" data-lucide="refresh-cw" class="w-3.5 h-3.5 text-emerald-500"></i>
+                    <span class="hidden md:inline">Sync Cloud</span>
+                </button>
+
+                <button onclick="openSimulatorModal(selectedInspectDayIso)" title="Simulate or edit Garmin watch sensor telemetry" class="px-3 py-2 rounded-xl bg-stone-100 dark:bg-slate-800/90 hover:bg-stone-200 dark:hover:bg-slate-700 border border-stone-200 dark:border-slate-700/80 text-xs font-semibold transition flex items-center gap-1.5">
+                    <i data-lucide="watch" class="w-3.5 h-3.5 text-cyan-400"></i>
+                    <span class="hidden sm:inline">Sensor Sim</span>
+                </button>
+
+                <button onclick="openCloudModal()" title="Configure Pipeline A: Supabase & GitHub Actions" class="p-2 rounded-xl border border-stone-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-stone-100 dark:hover:bg-slate-800 transition">
+                    <i data-lucide="cloud-cog" class="w-4 h-4"></i>
+                </button>
+
+                <button onclick="toggleTheme()" aria-label="Toggle Theme" class="p-2 rounded-xl border border-stone-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-stone-100 dark:hover:bg-slate-800 transition">
+                    <i id="theme-icon" data-lucide="sun" class="w-4 h-4"></i>
+                </button>
+
+                <button onclick="openNewGoalModal()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-emerald-600/20 transition flex items-center gap-1.5">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Add Growth Goal</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+
+        <!-- Scripture Banner & Daily Stewardship Overview -->
+        <section class="bg-gradient-to-r from-emerald-950/90 via-[#111c2d] to-slate-900 text-stone-100 p-4 sm:p-5 rounded-2xl border border-emerald-500/20 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-start sm:items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0 mt-0.5 sm:mt-0">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-semibold">Colossians 2:6–7</span>
+                        <span class="text-xs text-stone-400">•</span>
+                        <span class="text-xs text-emerald-300 font-medium">Spirit, Mind &amp; Body Stewardship</span>
+                    </div>
+                    <p class="font-serif text-sm sm:text-base text-stone-100 mt-0.5 italic">
+                        “Rooted and built up in Him, strengthened in the faith as you were taught, and overflowing with thankfulness.”
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 self-end md:self-center shrink-0">
+                <div class="text-right">
+                    <span class="block text-[10px] font-mono uppercase tracking-wider text-stone-400">Selected Day Stewardship</span>
+                    <span id="banner-stewardship-summary" class="text-xs sm:text-sm font-bold text-emerald-300">0 Devotions • 0 Sensor Goals</span>
+                </div>
+                <button onclick="resetDemoData()" title="Reset sample devotions & Garmin telemetry" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-stone-300 transition flex items-center gap-1.5">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                    <span>Reset Sample</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Live Snapshot Row (5 Cards: 1 Spiritual/Manual Rhythm + 4 Garmin Biometrics) -->
+        <section>
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Daily Stewardship &amp; Garmin Snapshot</span>
+                    <span id="snapshot-day-label" class="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">Today</span>
+                </div>
+                <span class="text-[11px] text-slate-400 hidden sm:inline">Click any Garmin card to test sensor values • Click matrix cells to log devotions</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- 1. Spiritual & Manual Practices Card -->
+                <div class="bg-white dark:bg-[#131b2e] p-4 rounded-2xl border border-amber-500/30 dark:border-amber-500/25 shadow-sm flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="Auto-flame" class="hidden"></i>
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-500"></i>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Devotion &amp; Habits</span>
+                        </div>
+                        <div class="mt-1.5 flex items-baseline gap-2">
+                            <h2 id="card-manual-count" class="text-2xl font-extrabold font-mono">0/0</h2>
+                            <span id="card-manual-pct" class="text-xs font-mono font-bold text-amber-500">0%</span>
+                        </div>
+                        <p id="card-manual-sub" class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 truncate">Manual practices today</p>
+                    </div>
+                    <div class="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 shrink-0">
+                        <i data-lucide="book-heart" class="w-5 h-5"></i>
+                    </div>
+                </div>
+
+                <!-- 2. Daily Steps Card (Garmin) -->
+                <div onclick="openSimulatorModal(selectedInspectDayIso)" class="cursor-pointer group bg-white dark:bg-[#131b2e] p-4 rounded-2xl border border-stone-200/80 dark:border-slate-800/90 hover:border-cyan-500/50 transition shadow-sm flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="footprints" class="w-3.5 h-3.5 text-cyan-500"></i>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Garmin Steps</span>
+                        </div>
+                        <div class="mt-1.5 flex items-baseline gap-1.5">
+                            <h2 id="bio-steps-val" class="text-2xl font-extrabold font-mono">0</h2>
+                        </div>
+                        <p id="bio-steps-sub" class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-mono">Target: 10,000</p>
+                    </div>
+                    <div class="relative w-14 h-14 flex items-center justify-center shrink-0">
+                        <svg class="w-14 h-14 -rotate-90" viewBox="0 0 36 36">
+                            <path class="text-stone-100 dark:text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            <path id="bio-steps-ring" class="text-cyan-500 transition-all duration-500" stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                        </svg>
+                        <span id="bio-steps-pct" class="text-[10px] font-mono font-bold text-cyan-500 absolute">0%</span>
+                    </div>
+                </div>
+
+                <!-- 3. Sleep Duration & Sleep Score (Garmin) -->
+                <div onclick="openSimulatorModal(selectedInspectDayIso)" class="cursor-pointer group bg-white dark:bg-[#131b2e] p-4 rounded-2xl border border-stone-200/80 dark:border-slate-800/90 hover:border-indigo-500/50 transition shadow-sm flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="moon" class="w-3.5 h-3.5 text-indigo-400"></i>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Rest &amp; Sleep</span>
+                        </div>
+                        <div class="mt-1.5 flex items-baseline gap-2">
+                            <h2 id="bio-sleep-val" class="text-2xl font-extrabold font-mono">0.0h</h2>
+                            <span id="bio-sleep-score" class="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">Score --</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-mono">Garmin Sleep DTO</p>
+                    </div>
+                    <div class="w-11 h-11 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+                        <i data-lucide="bed-double" class="w-5 h-5"></i>
+                    </div>
+                </div>
+
+                <!-- 4. Body Battery & Stress (Garmin) -->
+                <div onclick="openSimulatorModal(selectedInspectDayIso)" class="cursor-pointer group bg-white dark:bg-[#131b2e] p-4 rounded-2xl border border-stone-200/80 dark:border-slate-800/90 hover:border-emerald-500/50 transition shadow-sm flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="battery-charging" class="w-3.5 h-3.5 text-emerald-400"></i>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Body Battery</span>
+                        </div>
+                        <div class="mt-1.5 flex items-baseline gap-2">
+                            <h2 id="bio-bb-val" class="text-2xl font-extrabold font-mono">0</h2>
+                            <span class="text-xs text-slate-400 font-mono">/ 100</span>
+                        </div>
+                        <p id="bio-stress-sub" class="text-[11px] text-amber-500 font-mono mt-1">Avg Stress: --</p>
+                    </div>
+                    <div class="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                        <i data-lucide="zap" class="w-5 h-5"></i>
+                    </div>
+                </div>
+
+                <!-- 5. Unified Daily Faithfulness Score -->
+                <div class="bg-gradient-to-br from-emerald-950 via-[#111c2d] to-slate-900 text-white p-4 rounded-2xl border border-emerald-500/30 shadow-sm flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="sprout" class="w-3.5 h-3.5 text-emerald-400"></i>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-300">Whole-Life Score</span>
+                        </div>
+                        <div class="mt-1.5 flex items-baseline gap-2">
+                            <h2 id="bio-rules-count" class="text-2xl font-extrabold font-mono">0/0</h2>
+                            <span id="bio-rules-pct" class="text-xs font-mono font-bold text-amber-300">0%</span>
+                        </div>
+                        <p id="bio-rules-streak" class="text-[11px] text-stone-300 mt-1 truncate">Spirit + Body combined</p>
+                    </div>
+                    <div class="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 shrink-0">
+                        <i data-lucide="award" class="w-5 h-5"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Workspace Grid: Left 8 Cols Hybrid 7-Day Matrix | Right 4 Cols Growth Chart & Garmin Workouts -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Left 8 Cols: 7-Day Hybrid Stewardship Matrix (Manual Devotions + Garmin Sensors) -->
+            <section class="lg:col-span-8 bg-white dark:bg-[#131b2e] rounded-2xl border border-stone-200/80 dark:border-slate-800/90 shadow-sm overflow-hidden flex flex-col">
+                <!-- Header & Filter Bar -->
+                <div class="p-5 border-b border-stone-200/80 dark:border-slate-800/80 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h2 class="font-serif text-base sm:text-lg font-bold">7-Day Growth &amp; Stewardship Matrix</h2>
+                                <span id="rule-count-badge" class="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-full bg-stone-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">0 goals</span>
+                            </div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                <span class="text-amber-500 font-semibold">Manual Practices:</span> click any day cell to check off or log time.
+                                <span class="text-cyan-500 font-semibold ml-1">Garmin Sensors:</span> auto-complete from watch telemetry.
+                            </p>
+                        </div>
+
+                        <!-- Source Type Filter (All | Manual | Garmin Sensor) -->
+                        <div class="inline-flex p-1 rounded-xl bg-stone-100 dark:bg-slate-900 border border-stone-200/70 dark:border-slate-800 self-start sm:self-auto shrink-0">
+                            <button onclick="setSourceFilter('all')" data-src="all" class="src-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold transition bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm">All</button>
+                            <button onclick="setSourceFilter('manual')" data-src="manual" class="src-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold transition text-slate-500 dark:text-slate-400">✋ Manual</button>
+                            <button onclick="setSourceFilter('sensor')" data-src="sensor" class="src-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold transition text-slate-500 dark:text-slate-400">⌚ Sensor</button>
+                        </div>
+                    </div>
+
+                    <!-- Category Filter Pills -->
+                    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+                        <button onclick="setCategoryFilter('All')" data-cat="All" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-emerald-600 text-white">All Pillars</button>
+                        <button onclick="setCategoryFilter('Spirit')" data-cat="Spirit" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-stone-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Spirit &amp; Devotion</button>
+                        <button onclick="setCategoryFilter('Body')" data-cat="Body" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-stone-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Body (Garmin)</button>
+                        <button onclick="setCategoryFilter('Mind')" data-cat="Mind" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-stone-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Mind &amp; Peace</button>
+                        <button onclick="setCategoryFilter('Stewardship')" data-cat="Stewardship" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-stone-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Stewardship</button>
+                    </div>
+                </div>
+
+                <!-- 7-Day Hybrid Matrix Table -->
+                <div class="overflow-x-auto flex-1">
+                    <table class="w-full text-left border-collapse min-w-[760px]">
+                        <thead>
+                            <tr id="table-days-header" class="border-b border-stone-200/70 dark:border-slate-800/80 text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 bg-stone-50/70 dark:bg-slate-900/50">
+                                <!-- Rendered via JS -->
+                            </tr>
+                        </thead>
+                        <tbody id="rules-table-body" class="divide-y divide-stone-200/60 dark:divide-slate-800/60 text-sm">
+                            <!-- Rendered via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden py-12 px-4 text-center">
+                    <p class="text-sm font-bold">No growth goals match this filter</p>
+                    <p class="text-xs text-slate-400 mt-1 mb-4">Add a spiritual devotion, daily habit, or Garmin sensor target to begin tracking.</p>
+                    <button onclick="openNewGoalModal()" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold">+ Add Growth Goal</button>
+                </div>
+
+                <!-- Footer Legend -->
+                <div class="px-5 py-3 bg-stone-50/80 dark:bg-[#0d1424] border-t border-stone-200/60 dark:border-slate-800/70 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-500 inline-block"></span> Manual Devotion / Habit (Click cell to log)</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block"></span> Garmin Sensor Met (100%+)</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-cyan-500 inline-block"></span> Near Sensor Threshold (&ge;80%)</span>
+                    </div>
+                    <button onclick="openNewGoalModal()" class="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold flex items-center gap-1">
+                        <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                        <span>Add Devotion or Sensor Goal</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right 4 Cols: Weekly Growth Chart + Garmin Activities -->
+            <section class="lg:col-span-4 flex flex-col gap-6">
+
+                <!-- Multi-Mode Weekly Consistency & Biometric Chart -->
+                <div class="bg-white dark:bg-[#131b2e] p-5 rounded-2xl border border-stone-200/80 dark:border-slate-800/90 shadow-sm">
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <div>
+                            <h2 class="font-serif text-base font-bold">Weekly Growth Rhythm</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Combined consistency or sensor stream</p>
+                        </div>
+                        <select id="chart-metric-select" onchange="setChartMetric(this.value)" class="px-2.5 py-1.5 rounded-xl bg-stone-100 dark:bg-slate-800 border border-stone-200 dark:border-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="goal_pct">Whole-Life Hit Rate (%)</option>
+                            <option value="manual_pct">Spirit &amp; Manual Habits (%)</option>
+                            <option value="steps">Garmin Steps</option>
+                            <option value="sleep_hours">Sleep Duration (hrs)</option>
+                            <option value="sleep_score">Sleep Score (0-100)</option>
+                            <option value="body_battery">Body Battery Peak</option>
+                            <option value="resting_hr">Resting HR (bpm)</option>
+                            <option value="active_minutes">Active Minutes</option>
+                        </select>
+                    </div>
+
+                    <!-- Bar Chart Area -->
+                    <div class="mt-4 pt-4 pb-2 px-2 bg-stone-50/80 dark:bg-[#0b101b]/70 rounded-xl border border-stone-200/60 dark:border-slate-800/70">
+                        <div id="weekly-bar-chart" class="grid grid-cols-7 gap-2 items-end h-44 pt-6 px-1">
+                            <!-- Rendered via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Selected Day Biometric Summary Pill Grid -->
+                    <div class="mt-4 pt-4 border-t border-stone-200/70 dark:border-slate-800/70">
+                        <div class="flex items-center justify-between text-xs mb-2.5">
+                            <span id="day-detail-title" class="font-bold text-slate-700 dark:text-slate-200">Today's Sensor Readout</span>
+                            <button onclick="openSimulatorModal(selectedInspectDayIso)" class="text-[11px] font-semibold text-emerald-500 hover:underline">Adjust Sensor Sim</button>
+                        </div>
+                        <div id="day-sensor-grid" class="grid grid-cols-4 gap-1.5 text-center">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recorded Garmin Activities Feed -->
+                <div class="bg-white dark:bg-[#131b2e] p-5 rounded-2xl border border-stone-200/80 dark:border-slate-800/90 shadow-sm flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h2 class="font-serif text-base font-bold flex items-center gap-2">
+                                    <span>Physical Stewardship Log</span>
+                                </h2>
+                                <p id="workouts-day-subtitle" class="text-xs text-slate-500 dark:text-slate-400">Garmin workouts on selected day</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                                <i data-lucide="watch" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+
+                        <div id="garmin-activities-list" class="space-y-2.5 mt-3">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-stone-200/60 dark:border-slate-800/70 flex items-center justify-between text-[11px] text-slate-400">
+                        <span>Syncs Habits + Garmin via <code class="font-mono text-emerald-400">Supabase</code></span>
+                        <button onclick="openCloudModal()" class="text-emerald-400 hover:underline font-semibold">Cloud Setup &rarr;</button>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- MODAL 1: Add Growth Goal (Hybrid: Manual Spiritual/Habit OR Garmin Biometric Sensor) -->
+    <div id="goal-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm">
+        <div class="bg-white dark:bg-[#131b2e] border border-stone-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl max-h-[92vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-slate-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                        <i data-lucide="sprout" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-serif font-bold text-base">Add Growth &amp; Stewardship Goal</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Choose a manual daily practice/devotion or an automated Garmin sensor rule</p>
+                    </div>
+                </div>
+                <button onclick="closeNewGoalModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-stone-100 dark:hover:bg-slate-800">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="new-goal-form" onsubmit="handleCreateGoal(event)" class="space-y-4 mt-4">
+                <!-- Goal Type Selector Tabs -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">1. Tracking Source</label>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <button type="button" id="tab-type-manual" onclick="switchGoalFormType('manual')" class="p-3 rounded-xl border-2 border-amber-500 bg-amber-500/10 text-left transition flex items-start gap-2.5">
+                            <i data-lucide="book-heart" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i>
+                            <div>
+                                <p class="text-xs font-bold text-slate-900 dark:text-white">Manual Practice / Devotion</p>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400">Check-in or log minutes/chapters outside of sensors</p>
+                            </div>
+                        </button>
+                        <button type="button" id="tab-type-sensor" onclick="switchGoalFormType('sensor')" class="p-3 rounded-xl border border-stone-200 dark:border-slate-800 hover:border-cyan-500/40 text-left transition flex items-start gap-2.5">
+                            <i data-lucide="watch" class="w-4 h-4 text-cyan-500 shrink-0 mt-0.5"></i>
+                            <div>
+                                <p class="text-xs font-bold text-slate-900 dark:text-white">Garmin Sensor Rule</p>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400">Auto-completes from watch steps, sleep, HR, stress</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Goal Name & Category -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Goal Title *</label>
+                        <input id="goal-name-input" type="text" required maxlength="44" placeholder="e.g., Morning Devotion & Prayer, Read 2 Chapters"
+                            class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Pillar</label>
+                        <select id="goal-category-input" class="w-full px-3 py-2.5 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-semibold">
+                            <option value="Spirit">Spirit &amp; Devotion</option>
+                            <option value="Mind">Mind &amp; Peace</option>
+                            <option value="Stewardship">Stewardship</option>
+                            <option value="Body">Body (Physical)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- SECTION A: Manual Habit Options -->
+                <div id="form-section-manual" class="p-3.5 rounded-xl bg-amber-500/5 border border-amber-500/20 space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1">Check-In Style</label>
+                            <select id="manual-mode-input" onchange="toggleManualTargetInputs(this.value)" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-semibold">
+                                <option value="boolean">Simple Checkmark (Done / Not Done)</option>
+                                <option value="numeric">Measurable Target (Minutes, Chapters, Pages)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1">Icon</label>
+                            <select id="manual-icon-input" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-semibold">
+                                <option value="book-open">📖 Scripture / Book</option>
+                                <option value="sparkles">✨ Prayer / Devotion</option>
+                                <option value="heart-handshake">🙏 Gratitude / Service</option>
+                                <option value="sun">🌅 Morning Rhythm</option>
+                                <option value="brain">🧠 Mindful Study</option>
+                                <option value="shield-off">📵 Digital Fast / Sabbath</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="manual-numeric-fields" class="hidden grid-cols-2 gap-3 pt-1">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-400 mb-1">Daily Target Number</label>
+                            <input id="manual-target-input" type="number" step="any" min="1" value="20"
+                                class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-sm font-mono font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-400 mb-1">Unit Label</label>
+                            <input id="manual-unit-input" type="text" maxlength="12" value="mins" placeholder="mins, ch, pages"
+                                class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-sm font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION B: Garmin Sensor Options -->
+                <div id="form-section-sensor" class="hidden p-3.5 rounded-xl bg-cyan-500/5 border border-cyan-500/20 space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-semibold uppercase tracking-wider text-cyan-500 mb-1">Garmin Metric</label>
+                            <select id="rule-metric-input" onchange="handleMetricPresetChange(this.value)" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-mono font-semibold">
+                                <option value="steps">steps (Daily Steps)</option>
+                                <option value="sleep_hours">sleep_hours (Sleep Hrs)</option>
+                                <option value="sleep_score">sleep_score (Sleep Score)</option>
+                                <option value="active_minutes">active_minutes (Active Min)</option>
+                                <option value="body_battery">body_battery (Body Battery)</option>
+                                <option value="resting_hr">resting_hr (Resting HR bpm)</option>
+                                <option value="stress_avg">stress_avg (Avg Stress)</option>
+                                <option value="hydration_ml">hydration_ml (Hydration ml)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold uppercase tracking-wider text-cyan-500 mb-1">Condition</label>
+                            <select id="rule-operator-input" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-mono font-bold">
+                                <option value=">=">&ge; (At least)</option>
+                                <option value="<=">&le; (At most)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold uppercase tracking-wider text-cyan-500 mb-1">Target Threshold</label>
+                            <input id="rule-target-input" type="number" step="any" value="10000"
+                                class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-sm font-mono font-bold">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Frequency & Color -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Weekly Frequency Goal</label>
+                        <select id="goal-weekly-input" class="w-full px-3 py-2.5 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-semibold">
+                            <option value="7">Every Day (7 days/wk)</option>
+                            <option value="6">6 days/wk (Sabbath grace)</option>
+                            <option value="5">5 days/wk</option>
+                            <option value="4">4 days/wk</option>
+                            <option value="3">3 days/wk</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Accent Color</label>
+                        <select id="goal-color-input" class="w-full px-3 py-2.5 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-semibold">
+                            <option value="amber">Amber Gold (Spirit / Devotion)</option>
+                            <option value="emerald">Emerald (Growth / Stewardship)</option>
+                            <option value="cyan">Cyan (Garmin Telemetry)</option>
+                            <option value="indigo">Indigo (Rest &amp; Peace)</option>
+                            <option value="rose">Rose (Heart &amp; Vitality)</option>
+                            <option value="purple">Purple (Wisdom)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-3 flex items-center justify-end gap-2 border-t border-stone-200 dark:border-slate-800">
+                    <button type="button" onclick="closeNewGoalModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:bg-stone-100 dark:hover:bg-slate-800">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25">Save Growth Goal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Log Manual Measurable Practice (e.g., Minutes of Prayer or Chapters Read) -->
+    <div id="manual-log-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+        <div class="bg-white dark:bg-[#131b2e] border border-stone-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-slate-800">
+                <div>
+                    <h3 id="manual-log-title" class="font-serif font-bold text-base">Log Daily Practice</h3>
+                    <p id="manual-log-subtitle" class="text-xs text-slate-500 dark:text-slate-400 font-mono">Date</p>
+                </div>
+                <button onclick="closeManualLogModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-stone-100 dark:hover:bg-slate-800">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <form onsubmit="handleSaveManualNumericLog(event)" class="space-y-4 mt-4">
+                <input type="hidden" id="manual-log-rule-id">
+                <input type="hidden" id="manual-log-iso">
+                <div>
+                    <label id="manual-log-unit-label" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Amount Completed</label>
+                    <input id="manual-log-val-input" type="number" step="any" min="0" required
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-lg font-mono font-bold focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="quickSetManualTarget()" class="flex-1 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/25 text-xs font-semibold">Mark Full Target Met</button>
+                    <button type="button" onclick="quickClearManualTarget()" class="py-2 px-3 rounded-xl bg-stone-100 dark:bg-slate-800 text-slate-400 hover:text-rose-400 text-xs font-semibold">Reset 0</button>
+                </div>
+                <div class="pt-2 flex justify-end gap-2 border-t border-stone-200 dark:border-slate-800">
+                    <button type="button" onclick="closeManualLogModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold">Save Log</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Simulate / Edit Day Garmin Telemetry -->
+    <div id="simulator-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+        <div class="bg-white dark:bg-[#131b2e] border border-stone-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-slate-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+                        <i data-lucide="watch" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-serif font-bold text-base">Garmin Sensor Telemetry Simulator</h3>
+                        <p id="sim-modal-subtitle" class="text-xs text-slate-500 dark:text-slate-400 font-mono">Inspecting date</p>
+                    </div>
+                </div>
+                <button onclick="closeSimulatorModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-stone-100 dark:hover:bg-slate-800">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleSaveSimulatedTelemetry(event)" class="space-y-4 mt-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Select Day to Edit</label>
+                    <select id="sim-day-select" onchange="loadSimulatorFields(this.value)" class="w-full px-3 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-mono font-semibold"></select>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Steps</label>
+                        <input id="sim-steps" type="number" step="100" min="0" max="100000" class="w-full px-3 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Sleep (Hours)</label>
+                        <input id="sim-sleep-hours" type="number" step="0.1" min="0" max="24" class="w-full px-3 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Sleep Score</label>
+                        <input id="sim-sleep-score" type="number" step="1" min="0" max="100" class="w-full px-3 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Active Mins</label>
+                        <input id="sim-active-mins" type="number" step="1" min="0" max="600" class="w-full px-3 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Body Battery</label>
+                        <input id="sim-bb" type="number" step="1" min="5" max="100" class="w-full px-3 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Resting HR (bpm)</label>
+                        <input id="sim-rhr" type="number" step="1" min="30" max="120" class="w-full px-3 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Avg Stress</label>
+                        <input id="sim-stress" type="number" step="1" min="0" max="100" class="w-full px-3 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Hydration (ml)</label>
+                        <input id="sim-hydration" type="number" step="100" min="0" max="10000" class="w-full px-3 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-sm font-mono">
+                    </div>
+                </div>
+
+                <!-- Quick Presets -->
+                <div class="flex items-center justify-between pt-1">
+                    <span class="text-[11px] text-slate-400">Quick Presets:</span>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="applyTelemetryPreset('peak')" class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold hover:bg-emerald-500/20">Peak Vitality Day</button>
+                        <button type="button" onclick="applyTelemetryPreset('rest')" class="px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold hover:bg-amber-500/20">High Strain / Low Sleep</button>
+                    </div>
+                </div>
+
+                <div class="pt-3 flex items-center justify-end gap-2 border-t border-stone-200 dark:border-slate-800">
+                    <button type="button" onclick="closeSimulatorModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:bg-stone-100 dark:hover:bg-slate-800">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25">Apply Sensor Telemetry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 4: Pipeline A Cloud Configuration (Supabase + GitHub Actions Trigger) -->
+    <div id="cloud-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm">
+        <div class="bg-white dark:bg-[#131b2e] border border-stone-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-slate-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                        <i data-lucide="cloud-cog" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-serif font-bold text-base">Pipeline A: Hybrid Cloud &amp; Garmin Sync</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Syncs both manual devotions &amp; Garmin biometrics via Supabase</p>
+                    </div>
+                </div>
+                <button onclick="closeCloudModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-stone-100 dark:hover:bg-slate-800">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleSaveCloudConfig(event)" class="space-y-4 mt-4">
+                <div class="p-3.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-xs text-slate-600 dark:text-slate-300 space-y-1.5">
+                    <p class="font-bold text-emerald-600 dark:text-emerald-400">How Hybrid Sync Works Across Your Devices:</p>
+                    <p>1. Your GitHub Action runs <code class="font-mono">garmin_sync.py</code> hourly to update watch metrics (<code class="font-mono">steps</code>, <code class="font-mono">sleep_hours</code>, <code class="font-mono">stress_avg</code>) in <code class="font-mono">garmin_daily_metrics</code>.</p>
+                    <p>2. When you check off a <strong>Morning Devotion</strong> or manual habit on your phone or laptop, it saves into the <code class="font-mono">manual_logs</code> JSONB column for that date so both worlds stay in sync!</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Supabase Project URL</label>
+                    <input id="cfg-supabase-url" type="url" placeholder="https://xyzcompany.supabase.co"
+                        class="w-full px-3.5 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-mono">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Supabase Anon Public Key</label>
+                    <input id="cfg-supabase-key" type="password" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                        class="w-full px-3.5 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-mono">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Personal Sync Key / User ID (Multi-User Separation)</label>
+                    <input id="cfg-user-id" type="text" placeholder="default" value="default"
+                        class="w-full px-3.5 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-mono">
+                </div>
+
+                <details class="p-3 rounded-xl bg-stone-50 dark:bg-slate-900/90 border border-stone-200 dark:border-slate-800 text-xs">
+                    <summary class="font-semibold cursor-pointer text-emerald-500">View SQL Upgrade for Manual Devotions (`manual_logs` column)</summary>
+                    <pre class="mt-2 p-2.5 rounded-lg bg-slate-950 text-emerald-300 font-mono text-[11px] overflow-x-auto">alter table public.garmin_daily_metrics
+add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
+                </details>
+
+                <div class="pt-2 border-t border-stone-200 dark:border-slate-800">
+                    <p class="text-xs font-bold text-slate-400 mb-2">Optional: Trigger GitHub Action from Dashboard</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">GitHub Repo (<code class="font-mono">owner/repo</code>)</label>
+                            <input id="cfg-gh-repo" type="text" placeholder="alex/rooted-and-built"
+                                class="w-full px-3 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">GitHub Fine-Grained PAT</label>
+                            <input id="cfg-gh-pat" type="password" placeholder="github_pat_..."
+                                class="w-full px-3 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-3 flex items-center justify-between gap-2 border-t border-stone-200 dark:border-slate-800">
+                    <button type="button" onclick="disconnectCloud()" class="px-3 py-2 rounded-xl text-xs font-semibold text-rose-500 hover:bg-rose-500/10">Disconnect</button>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="closeCloudModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:bg-stone-100 dark:hover:bg-slate-800">Close</button>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25">Save &amp; Sync Now</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        /********************************************************************
+         * 1. METRIC DEFINITIONS & STORAGE KEYS
+         ********************************************************************/
+        const STORAGE_TELEMETRY_KEY = 'rooted_built_telemetry_v3';
+        const STORAGE_RULES_KEY = 'rooted_built_hybrid_goals_v3';
+        const STORAGE_CLOUD_KEY = 'rooted_built_cloud_config_v3';
+
+        const METRIC_CATALOG = {
+            steps: {
+                label: 'Daily Steps',
+                unit: 'steps',
+                icon: 'footprints',
+                color: 'cyan',
+                defaultOp: '>=',
+                defaultTarget: 10000,
+                format: (v) => v >= 1000 ? (v / 1000).toFixed(1) + 'k' : String(v),
+                fullFormat: (v) => Number(v || 0).toLocaleString() + ' steps'
+            },
+            sleep_hours: {
+                label: 'Sleep Duration',
+                unit: 'hrs',
+                icon: 'moon',
+                color: 'indigo',
+                defaultOp: '>=',
+                defaultTarget: 7.5,
+                format: (v) => Number(v || 0).toFixed(1) + 'h',
+                fullFormat: (v) => Number(v || 0).toFixed(1) + ' hrs'
+            },
+            sleep_score: {
+                label: 'Sleep Score',
+                unit: 'pts',
+                icon: 'bed-double',
+                color: 'purple',
+                defaultOp: '>=',
+                defaultTarget: 80,
+                format: (v) => String(Math.round(v || 0)),
+                fullFormat: (v) => Math.round(v || 0) + ' / 100'
+            },
+            active_minutes: {
+                label: 'Active Intensity',
+                unit: 'min',
+                icon: 'flame',
+                color: 'emerald',
+                defaultOp: '>=',
+                defaultTarget: 30,
+                format: (v) => Math.round(v || 0) + 'm',
+                fullFormat: (v) => Math.round(v || 0) + ' mins'
+            },
+            body_battery: {
+                label: 'Body Battery Peak',
+                unit: 'pts',
+                icon: 'battery-charging',
+                color: 'emerald',
+                defaultOp: '>=',
+                defaultTarget: 80,
+                format: (v) => Math.round(v || 0) + '%',
+                fullFormat: (v) => Math.round(v || 0) + ' / 100'
+            },
+            resting_hr: {
+                label: 'Resting Heart Rate',
+                unit: 'bpm',
+                icon: 'heart-pulse',
+                color: 'rose',
+                defaultOp: '<=',
+                defaultTarget: 54,
+                format: (v) => Math.round(v || 0) + ' bpm',
+                fullFormat: (v) => Math.round(v || 0) + ' bpm'
+            },
+            stress_avg: {
+                label: 'Average Stress',
+                unit: 'score',
+                icon: 'activity',
+                color: 'amber',
+                defaultOp: '<=',
+                defaultTarget: 35,
+                format: (v) => String(Math.round(v || 0)),
+                fullFormat: (v) => Math.round(v || 0) + ' / 100'
+            },
+            hydration_ml: {
+                label: 'Daily Hydration',
+                unit: 'ml',
+                icon: 'droplets',
+                color: 'cyan',
+                defaultOp: '>=',
+                defaultTarget: 2500,
+                format: (v) => (v / 1000).toFixed(1) + 'L',
+                fullFormat: (v) => Number(v || 0).toLocaleString() + ' ml'
+            }
+        };
+
+        const COLOR_STYLES = {
+            amber:   { bg: 'bg-amber-500',   lightBg: 'bg-amber-500/10',   text: 'text-amber-500',   border: 'border-amber-500/30' },
+            emerald: { bg: 'bg-emerald-500', lightBg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/30' },
+            cyan:    { bg: 'bg-cyan-500',    lightBg: 'bg-cyan-500/10',    text: 'text-cyan-400',    border: 'border-cyan-500/30' },
+            indigo:  { bg: 'bg-indigo-500',  lightBg: 'bg-indigo-500/10',  text: 'text-indigo-400',  border: 'border-indigo-500/30' },
+            rose:    { bg: 'bg-rose-500',    lightBg: 'bg-rose-500/10',    text: 'text-rose-400',    border: 'border-rose-500/30' },
+            purple:  { bg: 'bg-purple-500',  lightBg: 'bg-purple-500/10',  text: 'text-purple-400',  border: 'border-purple-500/30' }
+        };
+
+        function getPast7Days() {
+            const days = [];
+            const today = new Date();
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                const iso = d.toISOString().split('T')[0];
+                const shortDay = d.toLocaleDateString('en-US', { weekday: 'short' });
+                const dayNum = d.getDate();
+                const fullLabel = i === 0 ? 'Today' : (i === 1 ? 'Yesterday' : `${shortDay}, ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`);
+                days.push({ iso, shortDay, dayNum, isToday: i === 0, fullLabel });
+            }
+            return days;
+        }
+
+        const weekDays = getPast7Days();
+        let selectedCategory = 'All';
+        let selectedSourceFilter = 'all'; // 'all' | 'manual' | 'sensor'
+        let selectedInspectDayIso = weekDays[6].iso;
+        let selectedChartMetric = 'goal_pct';
+        let currentGoalModalType = 'manual'; // 'manual' | 'sensor'
+
+        /********************************************************************
+         * 2. DEFAULT HYBRID GOALS (SPIRITUAL DEVOTIONS + GARMIN SENSORS)
+         ********************************************************************/
+        function getDefaultRules() {
+            return [
+                {
+                    id: 'g_devotion',
+                    name: 'Morning Devotion & Prayer',
+                    goalType: 'manual',
+                    manualMode: 'numeric',
+                    target: 20,
+                    unit: 'mins',
+                    icon: 'sparkles',
+                    category: 'Spirit',
+                    goalPerWeek: 7,
+                    color: 'amber'
+                },
+                {
+                    id: 'g_scripture',
+                    name: 'Scripture Reading & Meditation',
+                    goalType: 'manual',
+                    manualMode: 'boolean',
+                    target: 1,
+                    unit: 'done',
+                    icon: 'book-open',
+                    category: 'Spirit',
+                    goalPerWeek: 7,
+                    color: 'amber'
+                },
+                {
+                    id: 'g_steps',
+                    name: 'Daily Walking Stewardship (10k)',
+                    goalType: 'sensor',
+                    metric: 'steps',
+                    operator: '>=',
+                    target: 10000,
+                    category: 'Body',
+                    goalPerWeek: 6,
+                    color: 'cyan'
+                },
+                {
+                    id: 'g_sleep',
+                    name: 'Restorative Sleep (7.5h+)',
+                    goalType: 'sensor',
+                    metric: 'sleep_hours',
+                    operator: '>=',
+                    target: 7.5,
+                    category: 'Body',
+                    goalPerWeek: 6,
+                    color: 'indigo'
+                },
+                {
+                    id: 'g_active',
+                    name: 'Physical Training (30m+ Active)',
+                    goalType: 'sensor',
+                    metric: 'active_minutes',
+                    operator: '>=',
+                    target: 30,
+                    category: 'Body',
+                    goalPerWeek: 5,
+                    color: 'emerald'
+                },
+                {
+                    id: 'g_stress',
+                    name: 'Peaceful Pacing (Stress <= 35)',
+                    goalType: 'sensor',
+                    metric: 'stress_avg',
+                    operator: '<=',
+                    target: 35,
+                    category: 'Mind',
+                    goalPerWeek: 6,
+                    color: 'emerald'
+                },
+                {
+                    id: 'g_examen',
+                    name: 'Evening Gratitude Examen',
+                    goalType: 'manual',
+                    manualMode: 'boolean',
+                    target: 1,
+                    unit: 'done',
+                    icon: 'heart-handshake',
+                    category: 'Spirit',
+                    goalPerWeek: 6,
+                    color: 'purple'
+                },
+                {
+                    id: 'g_fast',
+                    name: 'Sabbath & Digital Fast After 9PM',
+                    goalType: 'manual',
+                    manualMode: 'boolean',
+                    target: 1,
+                    unit: 'done',
+                    icon: 'shield-off',
+                    category: 'Stewardship',
+                    goalPerWeek: 6,
+                    color: 'indigo'
+                }
+            ];
+        }
+
+        function getDefaultTelemetry() {
+            const samples = [
+                {
+                    steps: 11240, sleep_hours: 7.8, sleep_score: 84, active_minutes: 55, body_battery: 88, resting_hr: 51, stress_avg: 26, hydration_ml: 2700,
+                    manual_logs: { g_devotion: 25, g_scripture: true, g_examen: true, g_fast: true },
+                    activities: [{ name: 'Morning Prayer Walk & Zone 2 Run', duration_min: 42, avg_hr: 140, calories: 460, type: 'running' }]
+                },
+                {
+                    steps: 9420, sleep_hours: 7.1, sleep_score: 76, active_minutes: 35, body_battery: 79, resting_hr: 53, stress_avg: 31, hydration_ml: 2400,
+                    manual_logs: { g_devotion: 20, g_scripture: true, g_examen: false, g_fast: true },
+                    activities: [{ name: 'Strength & Functional Stewardship', duration_min: 45, avg_hr: 118, calories: 310, type: 'strength' }]
+                },
+                {
+                    steps: 12890, sleep_hours: 8.1, sleep_score: 89, active_minutes: 72, body_battery: 94, resting_hr: 49, stress_avg: 24, hydration_ml: 3100,
+                    manual_logs: { g_devotion: 30, g_scripture: true, g_examen: true, g_fast: true },
+                    activities: [{ name: 'Tempo Endurance Run', duration_min: 50, avg_hr: 156, calories: 610, type: 'running' }, { name: 'Evening Stretching', duration_min: 20, avg_hr: 92, calories: 85, type: 'mobility' }]
+                },
+                {
+                    steps: 8150, sleep_hours: 6.8, sleep_score: 72, active_minutes: 22, body_battery: 68, resting_hr: 55, stress_avg: 37, hydration_ml: 2100,
+                    manual_logs: { g_devotion: 15, g_scripture: true, g_examen: true, g_fast: false },
+                    activities: [{ name: 'Outdoor Walk', duration_min: 25, avg_hr: 98, calories: 140, type: 'walking' }]
+                },
+                {
+                    steps: 10540, sleep_hours: 7.6, sleep_score: 82, active_minutes: 48, body_battery: 85, resting_hr: 52, stress_avg: 28, hydration_ml: 2600,
+                    manual_logs: { g_devotion: 20, g_scripture: true, g_examen: true, g_fast: true },
+                    activities: [{ name: 'Indoor Cycling Session', duration_min: 48, avg_hr: 139, calories: 510, type: 'cycling' }]
+                },
+                {
+                    steps: 13400, sleep_hours: 8.3, sleep_score: 91, active_minutes: 80, body_battery: 95, resting_hr: 48, stress_avg: 23, hydration_ml: 3000,
+                    manual_logs: { g_devotion: 30, g_scripture: true, g_examen: true, g_fast: true },
+                    activities: [{ name: 'Saturday Long Trail Run', duration_min: 75, avg_hr: 145, calories: 830, type: 'running' }]
+                },
+                {
+                    steps: 10860, sleep_hours: 7.9, sleep_score: 86, active_minutes: 62, body_battery: 90, resting_hr: 50, stress_avg: 25, hydration_ml: 2800,
+                    manual_logs: { g_devotion: 25, g_scripture: true, g_examen: false, g_fast: true },
+                    activities: [{ name: 'Morning Zone 2 Run', duration_min: 44, avg_hr: 141, calories: 495, type: 'running' }]
+                }
+            ];
+
+            const map = {};
+            weekDays.forEach((d, idx) => {
+                map[d.iso] = { date: d.iso, ...samples[idx] };
+            });
+            return map;
+        }
+
+        let telemetryByDate = loadTelemetry();
+        let rules = loadRules();
+        let cloudConfig = loadCloudConfig();
+
+        function loadTelemetry() {
+            try {
+                const raw = localStorage.getItem(STORAGE_TELEMETRY_KEY);
+                if (!raw) return getDefaultTelemetry();
+                const parsed = JSON.parse(raw);
+                const defaults = getDefaultTelemetry();
+                weekDays.forEach(d => {
+                    if (!parsed[d.iso]) parsed[d.iso] = defaults[d.iso];
+                    if (!parsed[d.iso].manual_logs) parsed[d.iso].manual_logs = {};
+                });
+                return parsed;
+            } catch (e) {
+                return getDefaultTelemetry();
+            }
+        }
+
+        function saveTelemetry() {
+            try { localStorage.setItem(STORAGE_TELEMETRY_KEY, JSON.stringify(telemetryByDate)); } catch (e) {}
+        }
+
+        function loadRules() {
+            try {
+                const raw = localStorage.getItem(STORAGE_RULES_KEY);
+                if (!raw) return getDefaultRules();
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) && parsed.length > 0 ? parsed : getDefaultRules();
+            } catch (e) {
+                return getDefaultRules();
+            }
+        }
+
+        function saveRules() {
+            try { localStorage.setItem(STORAGE_RULES_KEY, JSON.stringify(rules)); } catch (e) {}
+        }
+
+        function loadCloudConfig() {
+            try {
+                const raw = localStorage.getItem(STORAGE_CLOUD_KEY);
+                return raw ? JSON.parse(raw) : { supabaseUrl: '', supabaseKey: '', userId: 'default', ghRepo: '', ghPat: '', lastSync: null };
+            } catch (e) {
+                return { supabaseUrl: '', supabaseKey: '', userId: 'default', ghRepo: '', ghPat: '', lastSync: null };
+            }
+        }
+
+        function saveCloudConfig() {
+            try { localStorage.setItem(STORAGE_CLOUD_KEY, JSON.stringify(cloudConfig)); } catch (e) {}
+        }
+
+        /********************************************************************
+         * 3. HYBRID EVALUATION ENGINE (MANUAL HABITS + GARMIN SENSORS)
+         ********************************************************************/
+        function evaluateRuleForDay(rule, isoDate) {
+            const dayData = telemetryByDate[isoDate] || {};
+            const manualLogs = dayData.manual_logs || {};
+
+            // TYPE B: Manual Practice / Devotion
+            if (rule.goalType === 'manual') {
+                const rawVal = manualLogs[rule.id];
+                if (rule.manualMode === 'numeric') {
+                    const actual = Number(rawVal || 0);
+                    const target = Number(rule.target || 1);
+                    const passed = actual >= target;
+                    const progressPct = target > 0 ? Math.min(100, Math.round((actual / target) * 100)) : 100;
+                    return {
+                        actual,
+                        target,
+                        passed,
+                        progressPct,
+                        displayText: `${actual}/${target}${rule.unit ? ' ' + rule.unit : ''}`,
+                        shortText: `${actual}${rule.unit ? rule.unit[0] : ''}`
+                    };
+                } else {
+                    const passed = Boolean(rawVal);
+                    return {
+                        actual: passed ? 1 : 0,
+                        target: 1,
+                        passed,
+                        progressPct: passed ? 100 : 0,
+                        displayText: passed ? 'Completed' : 'Not logged yet',
+                        shortText: passed ? 'Done' : 'Check'
+                    };
+                }
+            }
+
+            // TYPE A: Garmin Biometric Sensor Goal
+            const actual = Number(dayData[rule.metric] ?? 0);
+            const target = Number(rule.target);
+            const meta = METRIC_CATALOG[rule.metric] || METRIC_CATALOG.steps;
+
+            let passed = false;
+            let progressPct = 0;
+
+            if (rule.operator === '>=') {
+                passed = actual >= target;
+                progressPct = target > 0 ? Math.min(100, Math.round((actual / target) * 100)) : 100;
+            } else if (rule.operator === '<=') {
+                passed = actual > 0 && actual <= target;
+                if (actual <= 0) {
+                    progressPct = 0;
+                } else if (actual <= target) {
+                    progressPct = 100;
+                } else {
+                    const ratio = target / actual;
+                    progressPct = Math.max(15, Math.min(95, Math.round(ratio * 100)));
+                }
+            }
+
+            return {
+                actual,
+                target,
+                passed,
+                progressPct,
+                displayText: `${meta.fullFormat(actual)} (Target ${rule.operator} ${target})`,
+                shortText: meta.format(actual)
+            };
+        }
+
+        function calculateRuleStreak(rule) {
+            let streak = 0;
+            const todayEval = evaluateRuleForDay(rule, weekDays[6].iso);
+            const startIndex = todayEval.passed ? 6 : 5;
+
+            for (let i = startIndex; i >= 0; i--) {
+                const res = evaluateRuleForDay(rule, weekDays[i].iso);
+                if (res.passed) streak++;
+                else break;
+            }
+            return streak;
+        }
+
+        function getRuleWeeklyPassCount(rule) {
+            return weekDays.reduce((acc, d) => acc + (evaluateRuleForDay(rule, d.iso).passed ? 1 : 0), 0);
+        }
+
+        /********************************************************************
+         * 4. RENDERING FUNCTIONS
+         ********************************************************************/
+        function renderAll() {
+            renderHeaderStatus();
+            renderBiometricSnapshotCards();
+            renderMatrixHeader();
+            renderRulesMatrix();
+            renderTelemetryChart();
+            renderGarminActivities();
+            lucide.createIcons();
+        }
+
+        function renderHeaderStatus() {
+            const pill = document.getElementById('sync-status-pill');
+            const dot = document.getElementById('sync-status-dot');
+            const txt = document.getElementById('sync-status-text');
+
+            if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey) {
+                pill.className = 'inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition';
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot';
+                txt.textContent = `Supabase Synced (${cloudConfig.userId || 'default'})`;
+            } else {
+                pill.className = 'inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/25 hover:bg-amber-500/20 transition';
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500';
+                txt.textContent = 'Local + Demo Mode';
+            }
+        }
+
+        function renderBiometricSnapshotCards() {
+            const dayObj = weekDays.find(d => d.iso === selectedInspectDayIso) || weekDays[6];
+            const data = telemetryByDate[dayObj.iso] || {};
+
+            document.getElementById('snapshot-day-label').textContent = `${dayObj.fullLabel} (${dayObj.iso})`;
+
+            // 1. Manual Devotions & Practices Card
+            const manualRules = rules.filter(r => r.goalType === 'manual');
+            const manualPassed = manualRules.filter(r => evaluateRuleForDay(r, dayObj.iso).passed).length;
+            const manualPct = manualRules.length > 0 ? Math.round((manualPassed / manualRules.length) * 100) : 0;
+            document.getElementById('card-manual-count').textContent = `${manualPassed}/${manualRules.length}`;
+            document.getElementById('card-manual-pct').textContent = `${manualPct}%`;
+            document.getElementById('card-manual-sub').textContent = manualPassed === manualRules.length && manualRules.length > 0
+                ? 'All devotions complete ✨'
+                : `${manualRules.length - manualPassed} devotion/habit remaining`;
+
+            // 2. Steps
+            const steps = Number(data.steps || 0);
+            const stepsPct = Math.min(100, Math.round((steps / 10000) * 100));
+            document.getElementById('bio-steps-val').textContent = steps.toLocaleString();
+            document.getElementById('bio-steps-pct').textContent = `${stepsPct}%`;
+            document.getElementById('bio-steps-ring').setAttribute('stroke-dasharray', `${stepsPct}, 100`);
+
+            // 3. Sleep
+            const sleepHrs = Number(data.sleep_hours || 0);
+            const sleepScore = Math.round(data.sleep_score || 0);
+            document.getElementById('bio-sleep-val').textContent = `${sleepHrs.toFixed(1)}h`;
+            document.getElementById('bio-sleep-score').textContent = `Score ${sleepScore}`;
+
+            // 4. Body Battery & Stress
+            document.getElementById('bio-bb-val').textContent = Math.round(data.body_battery || 0);
+            document.getElementById('bio-stress-sub').textContent = `Avg Stress: ${Math.round(data.stress_avg || 0)} / 100`;
+
+            // 5. Whole-Life Combined Score
+            const totalRules = rules.length;
+            const passedRules = rules.filter(r => evaluateRuleForDay(r, dayObj.iso).passed).length;
+            const sensorRules = rules.filter(r => r.goalType !== 'manual');
+            const sensorPassed = sensorRules.filter(r => evaluateRuleForDay(r, dayObj.iso).passed).length;
+            const passPct = totalRules > 0 ? Math.round((passedRules / totalRules) * 100) : 0;
+
+            document.getElementById('bio-rules-count').textContent = `${passedRules}/${totalRules}`;
+            document.getElementById('bio-rules-pct').textContent = `${passPct}%`;
+            document.getElementById('bio-rules-streak').textContent = `${manualPassed} Spirit • ${sensorPassed} Body met`;
+            document.getElementById('banner-stewardship-summary').textContent =
+                `${manualPassed}/${manualRules.length} Devotions • ${sensorPassed}/${sensorRules.length} Garmin Goals`;
+        }
+
+        function renderMatrixHeader() {
+            const tr = document.getElementById('table-days-header');
+            let html = `<th class="py-3.5 pl-5 pr-3 w-64">Growth Goal (Manual &amp; Sensor)</th>`;
+            weekDays.forEach(day => {
+                const isSelected = day.iso === selectedInspectDayIso;
+                html += `
+                    <th onclick="selectInspectDay('${day.iso}')" class="py-2.5 px-1.5 text-center cursor-pointer select-none transition">
+                        <div class="inline-flex flex-col items-center px-2.5 py-1 rounded-xl transition ${
+                            isSelected
+                                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25 font-bold'
+                                : (day.isToday ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'hover:bg-stone-200/60 dark:hover:bg-slate-800')
+                        }">
+                            <span class="text-[10px] uppercase tracking-wider">${day.shortDay}</span>
+                            <span class="text-xs font-mono font-bold mt-0.5">${day.dayNum}</span>
+                        </div>
+                    </th>
+                `;
+            });
+            html += `<th class="py-3.5 px-2 text-center">Streak</th>`;
+            html += `<th class="py-3.5 pl-2 pr-5 text-right">Weekly</th>`;
+            tr.innerHTML = html;
+        }
+
+        function renderRulesMatrix() {
+            const tbody = document.getElementById('rules-table-body');
+            const emptyState = document.getElementById('empty-state');
+
+            const filtered = rules.filter(r => {
+                const catMatch = selectedCategory === 'All' || r.category === selectedCategory;
+                const srcMatch = selectedSourceFilter === 'all'
+                    || (selectedSourceFilter === 'manual' && r.goalType === 'manual')
+                    || (selectedSourceFilter === 'sensor' && r.goalType !== 'manual');
+                return catMatch && srcMatch;
+            });
+
+            document.getElementById('rule-count-badge').textContent = `${filtered.length} ${filtered.length === 1 ? 'goal' : 'goals'}`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            tbody.innerHTML = filtered.map(rule => {
+                const isManual = rule.goalType === 'manual';
+                const meta = isManual
+                    ? { icon: rule.icon || 'sparkles' }
+                    : (METRIC_CATALOG[rule.metric] || METRIC_CATALOG.steps);
+                const style = COLOR_STYLES[rule.color] || (isManual ? COLOR_STYLES.amber : COLOR_STYLES.cyan);
+                const streak = calculateRuleStreak(rule);
+                const weeklyCount = getRuleWeeklyPassCount(rule);
+                const weeklyGoal = rule.goalPerWeek || 7;
+                const weeklyPct = Math.min(100, Math.round((weeklyCount / weeklyGoal) * 100));
+
+                const subtitleTag = isManual
+                    ? (rule.manualMode === 'numeric'
+                        ? `<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">✋ Manual: ${rule.target} ${escapeHtml(rule.unit || 'mins')}</span>`
+                        : `<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">✋ Daily Check-In</span>`)
+                    : `<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">⌚ ${rule.metric} ${rule.operator} ${rule.target}</span>`;
+
+                const cellsHtml = weekDays.map(day => {
+                    const ev = evaluateRuleForDay(rule, day.iso);
+                    const isSelectedCol = day.iso === selectedInspectDayIso;
+
+                    // Render Manual Check-In Cell vs Sensor Cell
+                    if (isManual) {
+                        if (rule.manualMode === 'boolean') {
+                            return `
+                                <td class="py-3 px-1.5 text-center ${isSelectedCol ? 'bg-emerald-500/[0.03]' : ''}">
+                                    <button onclick="handleManualCellClick('${rule.id}', '${day.iso}')"
+                                        title="${escapeHtml(rule.name)} (${day.fullLabel}): Click to toggle completion"
+                                        class="w-[68px] h-[42px] rounded-xl border transition flex items-center justify-center mx-auto ${
+                                            ev.passed
+                                                ? 'bg-gradient-to-br from-amber-500 to-emerald-600 text-white border-transparent shadow-md shadow-emerald-600/20 check-pop'
+                                                : 'bg-stone-100/80 dark:bg-slate-800/70 text-slate-400 border-stone-200/80 dark:border-slate-700/70 hover:border-amber-500/50 hover:text-amber-400'
+                                        }">
+                                        ${ev.passed
+                                            ? '<i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>'
+                                            : '<i data-lucide="circle-dashed" class="w-4 h-4 opacity-55"></i>'}
+                                    </button>
+                                </td>
+                            `;
+                        } else {
+                            // Manual Numeric Target (e.g., 20 mins devotion)
+                            const badgeClasses = ev.passed
+                                ? 'bg-amber-500/15 text-amber-600 dark:text-amber-300 border-amber-500/40 font-bold'
+                                : (ev.actual > 0
+                                    ? 'bg-amber-500/5 text-amber-500 border-amber-500/25'
+                                    : 'bg-stone-100 dark:bg-slate-800/80 text-slate-400 border-stone-200/80 dark:border-slate-700/70');
+                            return `
+                                <td class="py-3 px-1.5 text-center ${isSelectedCol ? 'bg-emerald-500/[0.03]' : ''}">
+                                    <button onclick="handleManualCellClick('${rule.id}', '${day.iso}')"
+                                        title="${escapeHtml(rule.name)} (${day.fullLabel}): ${ev.displayText} — Click to log"
+                                        class="w-[68px] py-1.5 px-1.5 rounded-xl border ${badgeClasses} hover:scale-105 transition flex flex-col items-center mx-auto">
+                                        <div class="flex items-center gap-0.5 text-[11px] font-mono leading-tight">
+                                            <span>${ev.actual}/${ev.target}</span>
+                                            ${ev.passed ? '<i data-lucide="check" class="w-3 h-3 text-emerald-500 stroke-[3]"></i>' : ''}
+                                        </div>
+                                        <div class="w-full h-1 rounded-full bg-stone-200 dark:bg-slate-700/70 mt-1.5 overflow-hidden">
+                                            <div class="bg-amber-500 h-full rounded-full" style="width: ${ev.progressPct}%"></div>
+                                        </div>
+                                    </button>
+                                </td>
+                            `;
+                        }
+                    }
+
+                    // Sensor Cell
+                    let badgeClasses = 'bg-stone-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 border-stone-200/80 dark:border-slate-700/70';
+                    let barColor = 'bg-slate-400 dark:bg-slate-600';
+
+                    if (ev.passed) {
+                        badgeClasses = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 font-bold';
+                        barColor = 'bg-emerald-500';
+                    } else if (ev.progressPct >= 80) {
+                        badgeClasses = 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/30';
+                        barColor = 'bg-cyan-500';
+                    }
+
+                    return `
+                        <td class="py-3 px-1.5 text-center ${isSelectedCol ? 'bg-emerald-500/[0.03]' : ''}">
+                            <button onclick="handleSensorCellClick('${day.iso}')"
+                                title="${escapeHtml(rule.name)} (${day.fullLabel}): ${ev.displayText}"
+                                class="w-[68px] py-1.5 px-1.5 rounded-xl border ${badgeClasses} hover:scale-105 transition flex flex-col items-center mx-auto">
+                                <div class="flex items-center gap-1 text-[11px] font-mono leading-tight">
+                                    <span>${ev.shortText}</span>
+                                    ${ev.passed ? '<i data-lucide="check" class="w-3 h-3 text-emerald-500 stroke-[3]"></i>' : ''}
+                                </div>
+                                <div class="w-full h-1 rounded-full bg-stone-200 dark:bg-slate-700/70 mt-1.5 overflow-hidden">
+                                    <div class="${barColor} h-full rounded-full" style="width: ${ev.progressPct}%"></div>
+                                </div>
+                            </button>
+                        </td>
+                    `;
+                }).join('');
+
+                return `
+                    <tr class="group hover:bg-stone-50/90 dark:hover:bg-slate-800/30 transition">
+                        <td class="py-3 pl-5 pr-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl ${style.lightBg} ${style.text} border ${style.border} flex items-center justify-center shrink-0">
+                                    <i data-lucide="${meta.icon}" class="w-4 h-4"></i>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-semibold text-slate-800 dark:text-stone-100 truncate text-xs sm:text-sm">${escapeHtml(rule.name)}</p>
+                                    <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                        ${subtitleTag}
+                                        <span class="text-[10px] text-slate-400">• ${rule.category}</span>
+                                    </div>
+                                </div>
+                                <button onclick="deleteRule('${rule.id}')" title="Delete goal" class="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </td>
+                        ${cellsHtml}
+                        <td class="py-3 px-2 text-center">
+                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-mono font-bold ${streak > 0 ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : 'bg-stone-100 dark:bg-slate-800 text-slate-400'}">
+                                <i data-lucide="flame" class="w-3 h-3"></i>
+                                ${streak}d
+                            </span>
+                        </td>
+                        <td class="py-3 pl-2 pr-5 text-right">
+                            <div class="flex flex-col items-end gap-1">
+                                <span class="text-xs font-mono font-bold">${weeklyCount}/${weeklyGoal}</span>
+                                <div class="w-14 h-1.5 rounded-full bg-stone-100 dark:bg-slate-800 overflow-hidden">
+                                    <div class="${style.bg} h-full rounded-full transition-all duration-500" style="width: ${weeklyPct}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderTelemetryChart() {
+            const chartEl = document.getElementById('weekly-bar-chart');
+
+            const dayValues = weekDays.map(day => {
+                const d = telemetryByDate[day.iso] || {};
+                if (selectedChartMetric === 'goal_pct') {
+                    const total = rules.length;
+                    const passed = rules.filter(r => evaluateRuleForDay(r, day.iso).passed).length;
+                    const val = total > 0 ? Math.round((passed / total) * 100) : 0;
+                    return { iso: day.iso, shortDay: day.shortDay, isToday: day.isToday, val, display: `${val}%` };
+                } else if (selectedChartMetric === 'manual_pct') {
+                    const manualRules = rules.filter(r => r.goalType === 'manual');
+                    const passed = manualRules.filter(r => evaluateRuleForDay(r, day.iso).passed).length;
+                    const val = manualRules.length > 0 ? Math.round((passed / manualRules.length) * 100) : 0;
+                    return { iso: day.iso, shortDay: day.shortDay, isToday: day.isToday, val, display: `${val}%` };
+                } else {
+                    const meta = METRIC_CATALOG[selectedChartMetric] || METRIC_CATALOG.steps;
+                    const raw = Number(d[selectedChartMetric] || 0);
+                    return { iso: day.iso, shortDay: day.shortDay, isToday: day.isToday, val: raw, display: meta.format(raw) };
+                }
+            });
+
+            const maxVal = Math.max(...dayValues.map(v => v.val), 1);
+
+            chartEl.innerHTML = dayValues.map(item => {
+                const isSelected = item.iso === selectedInspectDayIso;
+                const heightPx = Math.max(10, Math.round((item.val / maxVal) * 116));
+
+                let barStyle = 'bg-gradient-to-t from-emerald-600 to-teal-400';
+                if (selectedChartMetric === 'manual_pct') {
+                    barStyle = 'bg-gradient-to-t from-amber-600 to-yellow-400';
+                } else if (selectedChartMetric === 'goal_pct' && item.val === 100) {
+                    barStyle = 'bg-gradient-to-t from-emerald-500 to-amber-400 shadow-lg shadow-emerald-500/20';
+                } else if (selectedChartMetric === 'resting_hr') {
+                    barStyle = 'bg-gradient-to-t from-rose-600 to-pink-400';
+                } else if (selectedChartMetric.startsWith('sleep')) {
+                    barStyle = 'bg-gradient-to-t from-indigo-600 to-purple-400';
+                }
+
+                return `
+                    <div onclick="selectInspectDay('${item.iso}')" class="flex flex-col items-center cursor-pointer group select-none">
+                        <span class="text-[10px] font-mono font-bold mb-1.5 truncate max-w-[46px] ${isSelected ? 'text-emerald-400 scale-105' : 'text-slate-400'}">${item.display}</span>
+                        <div class="w-full max-w-[34px] h-[116px] bg-stone-200/70 dark:bg-slate-800/60 rounded-xl flex items-end p-1 transition ${isSelected ? 'ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-[#0b101b]' : ''}">
+                            <div class="w-full rounded-lg bar-grow ${barStyle}" style="height: ${heightPx}px"></div>
+                        </div>
+                        <span class="mt-2 text-[11px] font-semibold ${item.isToday ? 'text-emerald-400 font-bold' : (isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-500')}">${item.shortDay}</span>
+                    </div>
+                `;
+            }).join('');
+
+            const dayObj = weekDays.find(d => d.iso === selectedInspectDayIso) || weekDays[6];
+            const d = telemetryByDate[dayObj.iso] || {};
+            document.getElementById('day-detail-title').textContent = `${dayObj.fullLabel} Sensor Readout`;
+
+            const miniMetrics = [
+                { label: 'Steps', val: METRIC_CATALOG.steps.format(d.steps || 0) },
+                { label: 'Sleep', val: `${Number(d.sleep_hours || 0).toFixed(1)}h (${d.sleep_score || 0})` },
+                { label: 'Battery', val: `${d.body_battery || 0}%` },
+                { label: 'Stress', val: `${d.stress_avg || 0}` }
+            ];
+
+            document.getElementById('day-sensor-grid').innerHTML = miniMetrics.map(m => `
+                <div class="p-2 rounded-xl bg-stone-50 dark:bg-slate-900/90 border border-stone-200/60 dark:border-slate-800">
+                    <span class="block text-[10px] uppercase text-slate-400">${m.label}</span>
+                    <span class="font-mono text-xs font-bold text-slate-800 dark:text-stone-100">${m.val}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderGarminActivities() {
+            const dayObj = weekDays.find(d => d.iso === selectedInspectDayIso) || weekDays[6];
+            const d = telemetryByDate[dayObj.iso] || {};
+            const activities = Array.isArray(d.activities) ? d.activities : [];
+
+            document.getElementById('workouts-day-subtitle').textContent = `Workouts logged on ${dayObj.fullLabel}`;
+            const container = document.getElementById('garmin-activities-list');
+
+            if (activities.length === 0) {
+                container.innerHTML = `
+                    <div class="p-4 rounded-xl bg-stone-50 dark:bg-slate-900/50 border border-stone-200/60 dark:border-slate-800 text-center text-xs text-slate-400">
+                        No structured watch workouts recorded on this day.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = activities.map(act => `
+                <div class="p-3 rounded-xl bg-stone-50/90 dark:bg-slate-900/70 border border-stone-200/70 dark:border-slate-800/80 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                            <i data-lucide="footprints" class="w-4 h-4"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-bold truncate">${escapeHtml(act.name || 'Garmin Activity')}</p>
+                            <p class="text-[11px] font-mono text-slate-400 mt-0.5">${act.duration_min || 0}m • ${act.avg_hr || '--'} bpm avg • ${act.calories || '--'} kcal</p>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">Garmin</span>
+                </div>
+            `).join('');
+        }
+
+        /********************************************************************
+         * 5. INTERACTIONS: MANUAL CHECK-INS & SENSOR SIMULATOR
+         ********************************************************************/
+        function selectInspectDay(iso) {
+            selectedInspectDayIso = iso;
+            renderAll();
+        }
+
+        async function handleManualCellClick(ruleId, isoDate) {
+            selectedInspectDayIso = isoDate;
+            const rule = rules.find(r => r.id === ruleId);
+            if (!rule) return;
+
+            if (!telemetryByDate[isoDate]) {
+                telemetryByDate[isoDate] = { date: isoDate, manual_logs: {} };
+            }
+            if (!telemetryByDate[isoDate].manual_logs) {
+                telemetryByDate[isoDate].manual_logs = {};
+            }
+
+            // If numeric manual practice (e.g., 20 mins prayer), open quick logger modal
+            if (rule.manualMode === 'numeric') {
+                openManualLogModal(rule, isoDate);
+                return;
+            }
+
+            // Toggle boolean completion
+            const current = Boolean(telemetryByDate[isoDate].manual_logs[ruleId]);
+            const nextState = !current;
+            telemetryByDate[isoDate].manual_logs[ruleId] = nextState;
+
+            saveTelemetry();
+            renderAll();
+
+            if (nextState) {
+                const allPassed = rules.length > 0 && rules.every(r => evaluateRuleForDay(r, isoDate).passed);
+                if (allPassed && typeof confetti === 'function') {
+                    confetti({ particleCount: 70, spread: 65, origin: { y: 0.7 } });
+                    showToast(`All Spirit & Body goals complete for ${isoDate}!`, 'emerald');
+                } else {
+                    showToast(`Checked off: ${rule.name}`, 'amber');
+                }
+            }
+
+            if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey) {
+                await pushDayTelemetryToSupabase(telemetryByDate[isoDate]);
+            }
+        }
+
+        function openManualLogModal(rule, isoDate) {
+            const currentVal = Number((telemetryByDate[isoDate]?.manual_logs || {})[rule.id] || 0);
+            document.getElementById('manual-log-rule-id').value = rule.id;
+            document.getElementById('manual-log-iso').value = isoDate;
+            document.getElementById('manual-log-title').textContent = rule.name;
+            document.getElementById('manual-log-subtitle').textContent = `${isoDate} • Target: ${rule.target} ${rule.unit || ''}`;
+            document.getElementById('manual-log-unit-label').textContent = `Logged (${rule.unit || 'units'})`;
+            document.getElementById('manual-log-val-input').value = currentVal > 0 ? currentVal : rule.target;
+
+            const modal = document.getElementById('manual-log-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('manual-log-val-input').focus();
+        }
+
+        function closeManualLogModal() {
+            const modal = document.getElementById('manual-log-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function quickSetManualTarget() {
+            const ruleId = document.getElementById('manual-log-rule-id').value;
+            const rule = rules.find(r => r.id === ruleId);
+            if (rule) {
+                document.getElementById('manual-log-val-input').value = rule.target;
+            }
+        }
+
+        function quickClearManualTarget() {
+            document.getElementById('manual-log-val-input').value = 0;
+        }
+
+        async function handleSaveManualNumericLog(e) {
+            e.preventDefault();
+            const ruleId = document.getElementById('manual-log-rule-id').value;
+            const iso = document.getElementById('manual-log-iso').value;
+            const val = Number(document.getElementById('manual-log-val-input').value || 0);
+
+            if (!telemetryByDate[iso]) telemetryByDate[iso] = { date: iso, manual_logs: {} };
+            if (!telemetryByDate[iso].manual_logs) telemetryByDate[iso].manual_logs = {};
+            telemetryByDate[iso].manual_logs[ruleId] = val;
+
+            saveTelemetry();
+            closeManualLogModal();
+            renderAll();
+
+            const rule = rules.find(r => r.id === ruleId);
+            showToast(`Saved ${val} ${rule?.unit || ''} for ${rule?.name || 'practice'}`, 'amber');
+
+            if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey) {
+                await pushDayTelemetryToSupabase(telemetryByDate[iso]);
+            }
+        }
+
+        function handleSensorCellClick(iso) {
+            selectedInspectDayIso = iso;
+            renderAll();
+            openSimulatorModal(iso);
+        }
+
+        function setChartMetric(metric) {
+            selectedChartMetric = metric;
+            renderTelemetryChart();
+            lucide.createIcons();
+        }
+
+        function setCategoryFilter(cat) {
+            selectedCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if (btn.dataset.cat === cat) {
+                    btn.className = 'cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-emerald-600 text-white';
+                } else {
+                    btn.className = 'cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-stone-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400';
+                }
+            });
+            renderRulesMatrix();
+            lucide.createIcons();
+        }
+
+        function setSourceFilter(src) {
+            selectedSourceFilter = src;
+            document.querySelectorAll('.src-btn').forEach(btn => {
+                if (btn.dataset.src === src) {
+                    btn.className = 'src-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold transition bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm';
+                } else {
+                    btn.className = 'src-btn px-2.5 py-1 rounded-lg text-[11px] font-semibold transition text-slate-500 dark:text-slate-400';
+                }
+            });
+            renderRulesMatrix();
+            lucide.createIcons();
+        }
+
+        /********************************************************************
+         * 6. ADD HYBRID GOAL MODAL LOGIC
+         ********************************************************************/
+        function openNewGoalModal() {
+            switchGoalFormType('manual');
+            const modal = document.getElementById('goal-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('goal-name-input').focus();
+        }
+
+        function closeNewGoalModal() {
+            const modal = document.getElementById('goal-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('new-goal-form').reset();
+            toggleManualTargetInputs('boolean');
+        }
+
+        function switchGoalFormType(type) {
+            currentGoalModalType = type;
+            const manualTab = document.getElementById('tab-type-manual');
+            const sensorTab = document.getElementById('tab-type-sensor');
+            const manualSec = document.getElementById('form-section-manual');
+            const sensorSec = document.getElementById('form-section-sensor');
+
+            if (type === 'manual') {
+                manualTab.className = 'p-3 rounded-xl border-2 border-amber-500 bg-amber-500/10 text-left transition flex items-start gap-2.5';
+                sensorTab.className = 'p-3 rounded-xl border border-stone-200 dark:border-slate-800 hover:border-cyan-500/40 text-left transition flex items-start gap-2.5';
+                manualSec.classList.remove('hidden');
+                sensorSec.classList.add('hidden');
+                document.getElementById('goal-category-input').value = 'Spirit';
+                document.getElementById('goal-color-input').value = 'amber';
+                document.getElementById('goal-name-input').placeholder = 'e.g., Morning Devotion & Prayer, Read 2 Chapters';
+            } else {
+                sensorTab.className = 'p-3 rounded-xl border-2 border-cyan-500 bg-cyan-500/10 text-left transition flex items-start gap-2.5';
+                manualTab.className = 'p-3 rounded-xl border border-stone-200 dark:border-slate-800 hover:border-amber-500/40 text-left transition flex items-start gap-2.5';
+                sensorSec.classList.remove('hidden');
+                manualSec.classList.add('hidden');
+                document.getElementById('goal-category-input').value = 'Body';
+                document.getElementById('goal-color-input').value = 'cyan';
+                document.getElementById('goal-name-input').placeholder = 'e.g., 10k Daily Steps, Restorative Sleep 7.5h+';
+            }
+        }
+
+        function toggleManualTargetInputs(mode) {
+            const numericWrap = document.getElementById('manual-numeric-fields');
+            if (mode === 'numeric') {
+                numericWrap.classList.remove('hidden');
+                numericWrap.classList.add('grid');
+            } else {
+                numericWrap.classList.add('hidden');
+                numericWrap.classList.remove('grid');
+            }
+        }
+
+        function handleMetricPresetChange(metricKey) {
+            const meta = METRIC_CATALOG[metricKey];
+            if (!meta) return;
+            document.getElementById('rule-operator-input').value = meta.defaultOp;
+            document.getElementById('rule-target-input').value = meta.defaultTarget;
+            document.getElementById('goal-color-input').value = meta.color;
+        }
+
+        function handleCreateGoal(e) {
+            e.preventDefault();
+            const name = document.getElementById('goal-name-input').value.trim();
+            if (!name) return;
+
+            const category = document.getElementById('goal-category-input').value;
+            const goalPerWeek = Number(document.getElementById('goal-weekly-input').value) || 7;
+            const color = document.getElementById('goal-color-input').value;
+
+            let newGoal;
+            if (currentGoalModalType === 'manual') {
+                const manualMode = document.getElementById('manual-mode-input').value;
+                const icon = document.getElementById('manual-icon-input').value;
+                const target = manualMode === 'numeric' ? Number(document.getElementById('manual-target-input').value || 20) : 1;
+                const unit = manualMode === 'numeric' ? (document.getElementById('manual-unit-input').value.trim() || 'mins') : 'done';
+
+                newGoal = {
+                    id: 'goal_' + Date.now(),
+                    name,
+                    goalType: 'manual',
+                    manualMode,
+                    target,
+                    unit,
+                    icon,
+                    category,
+                    goalPerWeek,
+                    color
+                };
+            } else {
+                const metric = document.getElementById('rule-metric-input').value;
+                const operator = document.getElementById('rule-operator-input').value;
+                const target = Number(document.getElementById('rule-target-input').value);
+
+                newGoal = {
+                    id: 'goal_' + Date.now(),
+                    name,
+                    goalType: 'sensor',
+                    metric,
+                    operator,
+                    target,
+                    category,
+                    goalPerWeek,
+                    color
+                };
+            }
+
+            rules.push(newGoal);
+            saveRules();
+            closeNewGoalModal();
+            renderAll();
+            showToast(`Added growth goal: ${name}`, 'emerald');
+        }
+
+        function deleteRule(id) {
+            rules = rules.filter(r => r.id !== id);
+            saveRules();
+            renderAll();
+            showToast('Removed goal from matrix', 'rose');
+        }
+
+        function resetDemoData() {
+            telemetryByDate = getDefaultTelemetry();
+            rules = getDefaultRules();
+            saveTelemetry();
+            saveRules();
+            renderAll();
+            showToast('Restored Rooted & Built default devotions & Garmin telemetry', 'emerald');
+        }
+
+        /********************************************************************
+         * 7. GARMIN SENSOR SIMULATOR MODAL
+         ********************************************************************/
+        function openSimulatorModal(isoDate) {
+            const targetIso = isoDate || selectedInspectDayIso;
+            const selectEl = document.getElementById('sim-day-select');
+            selectEl.innerHTML = weekDays.map(d => `<option value="${d.iso}" ${d.iso === targetIso ? 'selected' : ''}>${d.fullLabel} (${d.iso})</option>`).join('');
+
+            loadSimulatorFields(targetIso);
+            const modal = document.getElementById('simulator-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function loadSimulatorFields(isoDate) {
+            selectedInspectDayIso = isoDate;
+            const d = telemetryByDate[isoDate] || {};
+            document.getElementById('sim-modal-subtitle').textContent = `Editing watch telemetry for ${isoDate}`;
+            document.getElementById('sim-steps').value = d.steps ?? 10000;
+            document.getElementById('sim-sleep-hours').value = d.sleep_hours ?? 7.5;
+            document.getElementById('sim-sleep-score').value = d.sleep_score ?? 82;
+            document.getElementById('sim-active-mins').value = d.active_minutes ?? 45;
+            document.getElementById('sim-bb').value = d.body_battery ?? 85;
+            document.getElementById('sim-rhr').value = d.resting_hr ?? 52;
+            document.getElementById('sim-stress').value = d.stress_avg ?? 28;
+            document.getElementById('sim-hydration').value = d.hydration_ml ?? 2500;
+        }
+
+        function applyTelemetryPreset(type) {
+            if (type === 'peak') {
+                document.getElementById('sim-steps').value = 12400;
+                document.getElementById('sim-sleep-hours').value = 8.2;
+                document.getElementById('sim-sleep-score').value = 92;
+                document.getElementById('sim-active-mins').value = 65;
+                document.getElementById('sim-bb').value = 96;
+                document.getElementById('sim-rhr').value = 48;
+                document.getElementById('sim-stress').value = 22;
+                document.getElementById('sim-hydration').value = 3000;
+            } else {
+                document.getElementById('sim-steps').value = 5400;
+                document.getElementById('sim-sleep-hours').value = 5.8;
+                document.getElementById('sim-sleep-score').value = 61;
+                document.getElementById('sim-active-mins').value = 15;
+                document.getElementById('sim-bb').value = 52;
+                document.getElementById('sim-rhr').value = 58;
+                document.getElementById('sim-stress').value = 46;
+                document.getElementById('sim-hydration').value = 1600;
+            }
+        }
+
+        async function handleSaveSimulatedTelemetry(e) {
+            e.preventDefault();
+            const iso = document.getElementById('sim-day-select').value;
+            const existing = telemetryByDate[iso] || {};
+
+            const updated = {
+                ...existing,
+                date: iso,
+                steps: Number(document.getElementById('sim-steps').value),
+                sleep_hours: Number(document.getElementById('sim-sleep-hours').value),
+                sleep_score: Number(document.getElementById('sim-sleep-score').value),
+                active_minutes: Number(document.getElementById('sim-active-mins').value),
+                body_battery: Number(document.getElementById('sim-bb').value),
+                resting_hr: Number(document.getElementById('sim-rhr').value),
+                stress_avg: Number(document.getElementById('sim-stress').value),
+                hydration_ml: Number(document.getElementById('sim-hydration').value),
+                manual_logs: existing.manual_logs || {}
+            };
+
+            telemetryByDate[iso] = updated;
+            saveTelemetry();
+            closeSimulatorModal();
+            renderAll();
+
+            if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey) {
+                await pushDayTelemetryToSupabase(updated);
+            }
+
+            showToast(`Updated Garmin sensor telemetry for ${iso}`, 'emerald');
+        }
+
+        function closeSimulatorModal() {
+            const modal = document.getElementById('simulator-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        /********************************************************************
+         * 8. PIPELINE A: SUPABASE HYBRID SYNC (GARMIN + MANUAL LOGS)
+         ********************************************************************/
+        function openCloudModal() {
+            document.getElementById('cfg-supabase-url').value = cloudConfig.supabaseUrl || '';
+            document.getElementById('cfg-supabase-key').value = cloudConfig.supabaseKey || '';
+            document.getElementById('cfg-user-id').value = cloudConfig.userId || 'default';
+            document.getElementById('cfg-gh-repo').value = cloudConfig.ghRepo || '';
+            document.getElementById('cfg-gh-pat').value = cloudConfig.ghPat || '';
+
+            const modal = document.getElementById('cloud-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeCloudModal() {
+            const modal = document.getElementById('cloud-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function handleSaveCloudConfig(e) {
+            e.preventDefault();
+            cloudConfig.supabaseUrl = document.getElementById('cfg-supabase-url').value.trim().replace(/\/$/, '');
+            cloudConfig.supabaseKey = document.getElementById('cfg-supabase-key').value.trim();
+            cloudConfig.userId = document.getElementById('cfg-user-id').value.trim() || 'default';
+            cloudConfig.ghRepo = document.getElementById('cfg-gh-repo').value.trim();
+            cloudConfig.ghPat = document.getElementById('cfg-gh-pat').value.trim();
+
+            saveCloudConfig();
+            closeCloudModal();
+            await fetchFromSupabase();
+            renderAll();
+        }
+
+        function disconnectCloud() {
+            cloudConfig = { supabaseUrl: '', supabaseKey: '', userId: 'default', ghRepo: '', ghPat: '', lastSync: null };
+            saveCloudConfig();
+            closeCloudModal();
+            renderAll();
+            showToast('Disconnected from Supabase Cloud', 'amber');
+        }
+
+        async function fetchFromSupabase() {
+            if (!cloudConfig.supabaseUrl || !cloudConfig.supabaseKey) return false;
+
+            try {
+                const startIso = weekDays[0].iso;
+                const url = `${cloudConfig.supabaseUrl}/rest/v1/garmin_daily_metrics?user_id=eq.${encodeURIComponent(cloudConfig.userId)}&date=gte.${startIso}&select=*`;
+                const res = await fetch(url, {
+                    headers: {
+                        'apikey': cloudConfig.supabaseKey,
+                        'Authorization': `Bearer ${cloudConfig.supabaseKey}`
+                    }
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const rows = await res.json();
+
+                if (Array.isArray(rows) && rows.length > 0) {
+                    rows.forEach(row => {
+                        if (row.date) {
+                            const localManual = telemetryByDate[row.date]?.manual_logs || {};
+                            telemetryByDate[row.date] = {
+                                date: row.date,
+                                steps: row.steps ?? 0,
+                                sleep_hours: Number(row.sleep_hours ?? 0),
+                                sleep_score: row.sleep_score ?? 0,
+                                active_minutes: row.active_minutes ?? 0,
+                                body_battery: row.body_battery ?? 0,
+                                resting_hr: row.resting_hr ?? 0,
+                                stress_avg: row.stress_avg ?? 0,
+                                hydration_ml: row.hydration_ml ?? 0,
+                                manual_logs: { ...localManual, ...(row.manual_logs || {}) },
+                                activities: Array.isArray(row.activities) ? row.activities : []
+                            };
+                        }
+                    });
+                    saveTelemetry();
+                }
+
+                cloudConfig.lastSync = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                saveCloudConfig();
+                showToast(`Synced ${rows.length} day(s) of devotions & Garmin data`, 'emerald');
+                return true;
+            } catch (err) {
+                showToast('Supabase sync note: verify URL/Key & schema', 'amber');
+                return false;
+            }
+        }
+
+        async function pushDayTelemetryToSupabase(dayPayload) {
+            if (!cloudConfig.supabaseUrl || !cloudConfig.supabaseKey) return;
+            try {
+                const url = `${cloudConfig.supabaseUrl}/rest/v1/garmin_daily_metrics`;
+                await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': cloudConfig.supabaseKey,
+                        'Authorization': `Bearer ${cloudConfig.supabaseKey}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'resolution=merge-duplicates'
+                    },
+                    body: JSON.stringify({
+                        user_id: cloudConfig.userId || 'default',
+                        date: dayPayload.date,
+                        steps: dayPayload.steps ?? 0,
+                        sleep_hours: dayPayload.sleep_hours ?? 0,
+                        sleep_score: dayPayload.sleep_score ?? 0,
+                        active_minutes: dayPayload.active_minutes ?? 0,
+                        body_battery: dayPayload.body_battery ?? 0,
+                        resting_hr: dayPayload.resting_hr ?? 0,
+                        stress_avg: dayPayload.stress_avg ?? 0,
+                        hydration_ml: dayPayload.hydration_ml ?? 0,
+                        manual_logs: dayPayload.manual_logs || {},
+                        activities: dayPayload.activities || []
+                    })
+                });
+            } catch (e) {}
+        }
+
+        async function triggerGarminSyncNow() {
+            const icon = document.getElementById('sync-now-icon');
+            if (icon) icon.classList.add('animate-spin');
+
+            if (cloudConfig.ghRepo && cloudConfig.ghPat) {
+                try {
+                    const ghUrl = `https://api.github.com/repos/${cloudConfig.ghRepo}/actions/workflows/garmin_sync.yml/dispatches`;
+                    const resp = await fetch(ghUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/vnd.github+json',
+                            'Authorization': `Bearer ${cloudConfig.ghPat}`
+                        },
+                        body: JSON.stringify({ ref: 'main' })
+                    });
+                    if (resp.ok) {
+                        showToast('Triggered GitHub Action garmin_sync.yml!', 'emerald');
+                    }
+                } catch (e) {
+                    showToast('Could not trigger GitHub Action; check Repo/PAT', 'amber');
+                }
+            }
+
+            if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey) {
+                await fetchFromSupabase();
+                renderAll();
+            } else {
+                showToast('Local state refreshed (Connect Supabase in Cloud settings for cross-device sync)', 'emerald');
+            }
+
+            setTimeout(() => {
+                if (icon) icon.classList.remove('animate-spin');
+            }, 600);
+        }
+
+        /********************************************************************
+         * 9. UTILITIES & INITIALIZATION
+         ********************************************************************/
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.toggle('dark');
+            const icon = document.getElementById('theme-icon');
+            icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+            lucide.createIcons();
+        }
+
+        function showToast(message, color = 'emerald') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 dark:bg-stone-100 text-white dark:text-slate-900 text-xs font-semibold shadow-xl border border-slate-700 dark:border-stone-300 transition-all duration-300';
+            toast.innerHTML = `<span class="w-2 h-2 rounded-full bg-${color}-500 shrink-0"></span><span>${escapeHtml(message)}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(8px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 2800);
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeSimulatorModal();
+                closeNewGoalModal();
+                closeManualLogModal();
+                closeCloudModal();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            renderAll();
+            if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey) {
+                await fetchFromSupabase();
+                renderAll();
+            }
+        });
+    </script>
+</body>
+</html>
