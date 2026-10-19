@@ -1,0 +1,16 @@
+ - name: Set up Python 3.11
+    uses: actions/setup-python@v5
+    with:
+      python-version: '3.11'
+
+  - name: Install garminconnect & supabase
+    run: pip install garminconnect supabase
+
+  - name: Run Garmin Telemetry Sync
+    env:
+      GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
+      GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+      USER_ID: 'default'
+    run: python garmin_sync.py
