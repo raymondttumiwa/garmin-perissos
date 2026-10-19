@@ -1,16 +1,30 @@
- - name: Set up Python 3.11
-    uses: actions/setup-python@v5
-    with:
-      python-version: '3.11'
+name: Garmin Connect Biometric Sync
 
-  - name: Install garminconnect & supabase
-    run: pip install garminconnect supabase
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
-  - name: Run Garmin Telemetry Sync
-    env:
-      GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
-      GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-      USER_ID: 'default'
-    run: python garmin_sync.py
+jobs:
+  sync-garmin-to-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install garminconnect requests
+
+      - name: Run Garmin to Supabase Sync
+        env:
+          GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SYNC_DAYS: '7'
+        run: python garmin_sync.py
