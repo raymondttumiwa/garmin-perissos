@@ -100,6 +100,34 @@
     <!-- Main Container -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
+        <nav class="flex gap-2" aria-label="Dashboard pages">
+            <button id="page-daily" onclick="setDashboardPage('daily')" class="px-4 py-2 rounded-xl text-sm font-semibold">Daily tracker</button>
+            <button id="page-progress" onclick="setDashboardPage('progress')" class="px-4 py-2 rounded-xl text-sm font-semibold">Progress</button>
+        </nav>
+        <section id="progress-page" class="hidden space-y-5">
+            <div class="flex flex-wrap justify-between items-center gap-4">
+                <div><h2 class="font-serif text-2xl font-bold">Your growth over time</h2><p class="text-xs text-slate-500 mt-1">Daily consistency across your current goals. Missing days stay visible as gaps.</p></div>
+                <div class="flex gap-2 items-center flex-wrap">
+                    <button id="period-month" onclick="setProgressPeriod('month')" class="px-3 py-2 rounded-xl text-sm font-semibold">Monthly</button>
+                    <button id="period-year" onclick="setProgressPeriod('year')" class="px-3 py-2 rounded-xl text-sm font-semibold">Yearly</button>
+                    <button onclick="moveProgressPeriod(-1)" aria-label="Previous period" class="px-3 py-2 rounded-xl border border-slate-500/30">←</button>
+                    <span id="progress-period-label" class="text-sm font-semibold min-w-28 text-center"></span>
+                    <button id="progress-next" onclick="moveProgressPeriod(1)" aria-label="Next period" class="px-3 py-2 rounded-xl border border-slate-500/30 disabled:opacity-30">→</button>
+                </div>
+            </div>
+            <div id="progress-summary" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+            <div class="bg-white dark:bg-[#131b2e] p-5 rounded-2xl border border-stone-200 dark:border-slate-800">
+                <h3 class="font-serif font-bold mb-4">Consistency calendar</h3>
+                <div id="progress-calendar"></div>
+                <p class="text-xs text-slate-500 mt-4">Green: 80–100% · Amber: 1–79% · 0%: logged day with no goals met · —: no data · Future days excluded</p>
+            </div>
+            <div class="bg-white dark:bg-[#131b2e] p-5 rounded-2xl border border-stone-200 dark:border-slate-800">
+                <h3 class="font-serif font-bold mb-4">Progress by goal</h3>
+                <div id="progress-goals" class="space-y-4"></div>
+                <p class="text-xs text-slate-500 mt-4">Completion uses elapsed calendar days and your current goal targets, including days without data.</p>
+            </div>
+        </section>
+        <div id="daily-page" class="space-y-6">
         <!-- Scripture Banner & Daily Stewardship Overview -->
         <section class="bg-gradient-to-r from-emerald-950/90 via-[#111c2d] to-slate-900 text-stone-100 p-4 sm:p-5 rounded-2xl border border-emerald-500/20 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-start sm:items-center gap-3.5">
@@ -376,6 +404,7 @@
                 </div>
 
             </section>
+        </div>
         </div>
     </main>
 
@@ -831,13 +860,20 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
             for (let i = 6; i >= 0; i--) {
                 const d = new Date(today);
                 d.setDate(today.getDate() - i);
-                const iso = d.toISOString().split('T')[0];
+                const iso = formatLocalDate(d);
                 const shortDay = d.toLocaleDateString('en-US', { weekday: 'short' });
                 const dayNum = d.getDate();
                 const fullLabel = i === 0 ? 'Today' : (i === 1 ? 'Yesterday' : `${shortDay}, ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`);
                 days.push({ iso, shortDay, dayNum, isToday: i === 0, fullLabel });
             }
             return days;
+        }
+
+        function formatLocalDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         }
 
         const weekDays = getPast7Days();
@@ -1002,9 +1038,8 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
                 const raw = localStorage.getItem(STORAGE_TELEMETRY_KEY);
                 if (!raw) return getDefaultTelemetry();
                 const parsed = JSON.parse(raw);
-                const defaults = getDefaultTelemetry();
                 weekDays.forEach(d => {
-                    if (!parsed[d.iso]) parsed[d.iso] = defaults[d.iso];
+                    if (!parsed[d.iso]) parsed[d.iso] = { date: d.iso, manual_logs: {} };
                     if (!parsed[d.iso].manual_logs) parsed[d.iso].manual_logs = {};
                 });
                 return parsed;
@@ -1134,7 +1169,73 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
         /********************************************************************
          * 4. RENDERING FUNCTIONS
          ********************************************************************/
+        let dashboardPage = 'daily';
+        let progressPeriod = 'month';
+        let progressAnchor = new Date();
+
+        function setDashboardPage(page) {
+            dashboardPage = page;
+            document.getElementById('daily-page').classList.toggle('hidden', page !== 'daily');
+            document.getElementById('progress-page').classList.toggle('hidden', page !== 'progress');
+            renderProgress();
+        }
+
+        function setProgressPeriod(period) {
+            progressPeriod = period;
+            renderProgress();
+        }
+
+        async function moveProgressPeriod(direction) {
+            progressAnchor = new Date(progressAnchor.getFullYear() + (progressPeriod === 'year' ? direction : 0), progressAnchor.getMonth() + (progressPeriod === 'month' ? direction : 0), 1);
+            renderProgress();
+            await fetchFromSupabase();
+            renderAll();
+        }
+
+        function renderProgress() {
+            const active = 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400';
+            for (const page of ['daily', 'progress']) document.getElementById(`page-${page}`).className = `px-4 py-2 rounded-xl text-sm font-semibold ${dashboardPage === page ? active : 'text-slate-500'}`;
+            for (const period of ['month', 'year']) document.getElementById(`period-${period}`).className = `px-3 py-2 rounded-xl text-sm font-semibold ${progressPeriod === period ? active : 'text-slate-500'}`;
+            const year = progressAnchor.getFullYear();
+            const firstMonth = progressPeriod === 'year' ? 0 : progressAnchor.getMonth();
+            const monthCount = progressPeriod === 'year' ? 12 : 1;
+            const today = formatLocalDate(new Date());
+            document.getElementById('progress-period-label').textContent = progressPeriod === 'year' ? year : progressAnchor.toLocaleDateString('en-US', {month: 'long', year: 'numeric'});
+            document.getElementById('progress-next').disabled = formatLocalDate(new Date(year, firstMonth + monthCount, 1)) > today;
+            const days = [];
+            const months = [];
+            for (let month = firstMonth; month < firstMonth + monthCount; month++) {
+                const cells = [];
+                const start = new Date(year, month, 1);
+                for (let i = 0; i < start.getDay(); i++) cells.push('<span></span>');
+                for (let day = 1; day <= new Date(year, month + 1, 0).getDate(); day++) {
+                    const iso = formatLocalDate(new Date(year, month, day));
+                    const future = iso > today;
+                    const recorded = Boolean(telemetryByDate[iso]);
+                    const passed = rules.filter(rule => evaluateRuleForDay(rule, iso).passed).length;
+                    const pct = rules.length ? Math.round(passed / rules.length * 100) : 0;
+                    if (!future) days.push({iso, recorded, passed, pct});
+                    const color = future ? 'opacity-30' : recorded && pct >= 80 ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : recorded && pct > 0 ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400' : 'bg-stone-100 dark:bg-slate-800';
+                    cells.push(`<div title="${iso}: ${future ? 'Future day' : recorded ? pct + '% goals met' : 'No data'}" class="rounded-lg p-1.5 text-center ${color}"><span class="block text-xs">${day}</span><span class="block text-[10px] font-mono">${future || !recorded ? '—' : pct + '%'}</span></div>`);
+                }
+                months.push(`<div><h4 class="text-sm font-semibold mb-3">${start.toLocaleDateString('en-US', {month: 'long'})}</h4><div class="grid grid-cols-7 gap-1">${['S','M','T','W','T','F','S'].map(d => `<span class="text-center text-[10px] text-slate-500">${d}</span>`).join('')}${cells.join('')}</div></div>`);
+            }
+            document.getElementById('progress-calendar').className = progressPeriod === 'year' ? 'grid sm:grid-cols-2 xl:grid-cols-3 gap-6' : 'max-w-2xl mx-auto';
+            document.getElementById('progress-calendar').innerHTML = months.join('');
+            const totalPassed = days.reduce((sum, day) => sum + day.passed, 0);
+            const hitRate = days.length && rules.length ? Math.round(totalPassed / (days.length * rules.length) * 100) : 0;
+            const workouts = days.reduce((sum, day) => sum + normalizeActivities(telemetryByDate[day.iso]?.activities).length, 0);
+            const minutes = days.reduce((sum, day) => sum + Number(telemetryByDate[day.iso]?.active_minutes || 0), 0);
+            document.getElementById('progress-summary').innerHTML = [['Goal completion', hitRate + '%'], ['Days with data', `${days.filter(d => d.recorded).length}/${days.length}`], ['Workouts', workouts], ['Active minutes', minutes.toLocaleString()]].map(([label,value]) => `<div class="bg-white dark:bg-[#131b2e] border border-stone-200 dark:border-slate-800 rounded-2xl p-4"><p class="text-xs text-slate-500">${label}</p><p class="text-2xl font-bold font-mono mt-2">${value}</p></div>`).join('');
+            document.getElementById('progress-goals').innerHTML = rules.length ? rules.map(rule => {
+                const count = days.filter(d => evaluateRuleForDay(rule, d.iso).passed).length;
+                const pct = days.length ? Math.round(count / days.length * 100) : 0;
+                return `<div><div class="flex justify-between gap-3 text-xs mb-2"><span class="font-semibold">${escapeHtml(rule.name)}</span><span class="text-slate-500">${count}/${days.length} days · ${pct}%</span></div><div class="h-2 rounded-full bg-stone-100 dark:bg-slate-800 overflow-hidden"><div class="h-full bg-emerald-500 rounded-full" style="width:${pct}%"></div></div></div>`;
+            }).join('') : '<p class="text-sm text-slate-500">Add a goal to start tracking progress.</p>';
+        }
+
         function renderAll() {
+            renderProgress();
             renderHeaderStatus();
             renderBiometricSnapshotCards();
             renderMatrixHeader();
@@ -1278,15 +1379,14 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
                             return `
                                 <td class="py-3 px-1.5 text-center ${isSelectedCol ? 'bg-emerald-500/[0.03]' : ''}">
                                     <button onclick="handleManualCellClick('${rule.id}', '${day.iso}')"
-                                        title="${escapeHtml(rule.name)} (${day.fullLabel}): Click to toggle completion"
+                                        aria-label="${escapeHtml(rule.name)} (${day.fullLabel})"
+                                        aria-pressed="${ev.passed}"
+                                        title="${escapeHtml(rule.name)} (${day.fullLabel}): ${ev.passed ? 'Completed' : 'Not completed'} — Click to toggle"
                                         class="w-[68px] h-[42px] rounded-xl border transition flex items-center justify-center mx-auto ${
                                             ev.passed
-                                                ? 'bg-gradient-to-br from-amber-500 to-emerald-600 text-white border-transparent shadow-md shadow-emerald-600/20 check-pop'
-                                                : 'bg-stone-100/80 dark:bg-slate-800/70 text-slate-400 border-stone-200/80 dark:border-slate-700/70 hover:border-amber-500/50 hover:text-amber-400'
+                                                ? `${style.bg} border-transparent`
+                                                : 'bg-transparent border-stone-300 dark:border-slate-600 hover:border-amber-500/50'
                                         }">
-                                        ${ev.passed
-                                            ? '<i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>'
-                                            : '<i data-lucide="circle-dashed" class="w-4 h-4 opacity-55"></i>'}
                                     </button>
                                 </td>
                             `;
@@ -1894,8 +1994,8 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
             if (!cloudConfig.supabaseUrl || !cloudConfig.supabaseKey) return false;
 
             try {
-                const startIso = weekDays[0].iso;
-                const url = `${cloudConfig.supabaseUrl}/rest/v1/garmin_daily_metrics?user_id=eq.${encodeURIComponent(cloudConfig.userId)}&date=gte.${startIso}&select=*`;
+                const startIso = formatLocalDate(new Date(Math.min(new Date(weekDays[0].iso + 'T12:00:00').getTime(), new Date(progressAnchor.getFullYear(), 0, 1).getTime())));
+                const url = `${cloudConfig.supabaseUrl}/rest/v1/garmin_daily_metrics?user_id=eq.${encodeURIComponent(cloudConfig.userId)}&date=gte.${startIso}&select=*&order=date.asc&limit=1000`;
                 const res = await fetch(url, {
                     headers: {
                         'apikey': cloudConfig.supabaseKey,
@@ -1921,7 +2021,7 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
                                 stress_avg: row.stress_avg ?? 0,
                                 hydration_ml: row.hydration_ml ?? 0,
                                 manual_logs: { ...localManual, ...(row.manual_logs || {}) },
-                                activities: Array.isArray(row.activities) ? row.activities : []
+                                activities: normalizeActivities(row.activities ?? row.workouts)
                             };
                         }
                     });
@@ -1936,6 +2036,19 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
                 showToast('Supabase sync note: verify URL/Key & schema', 'amber');
                 return false;
             }
+        }
+
+        function normalizeActivities(value) {
+            if (Array.isArray(value)) return value;
+            if (typeof value === 'string') {
+                try {
+                    const parsed = JSON.parse(value);
+                    return Array.isArray(parsed) ? parsed : [];
+                } catch (e) {
+                    return [];
+                }
+            }
+            return [];
         }
 
         async function pushDayTelemetryToSupabase(dayPayload) {
