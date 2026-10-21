@@ -1,0 +1,9 @@
+-- Force the 'date' column to be the official Primary Key
+ALTER TABLE public.garmin_daily_metrics 
+    DROP CONSTRAINT IF EXISTS garmin_daily_metrics_pkey;
+
+ALTER TABLE public.garmin_daily_metrics 
+    ADD PRIMARY KEY (date);
+
+-- Reload the schema cache so Supabase immediately recognizes it
+NOTIFY pgrst, 'reload schema';

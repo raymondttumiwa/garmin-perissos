@@ -18,10 +18,13 @@ jobs:
           python-version: '3.11'
 
       - name: Install Dependencies
-        run: pip install garminconnect supabase requests
+        run: pip install garminconnect requests
 
       - name: Run Garmin to Supabase Sync
         env:
+          GARMIN_TOKEN_BASE64: ${{ secrets.GARMIN_TOKEN_BASE64 }}
+          SUPABASE_USER_ID: ${{ vars.SUPABASE_USER_ID }}
+          GARMIN_TIMEZONE: ${{ vars.GARMIN_TIMEZONE }}
           GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
           GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rooted & Built — Faithful Stewardship & Biometric Rhythm</title>
+    <title>Perissos — Live in Overflow</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter, Fraunces (for warm editorial biblical headers) & JetBrains Mono -->
@@ -58,14 +58,14 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2 flex-wrap">
-                        <h1 class="font-serif font-bold text-base sm:text-xl tracking-tight text-slate-900 dark:text-stone-100">Rooted &amp; Built</h1>
-                        <span class="hidden sm:inline-block text-[11px] font-mono font-semibold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">Colossians 2:7</span>
+                        <h1 class="font-serif font-bold text-base sm:text-xl tracking-tight text-slate-900 dark:text-stone-100">περισσός</h1>
+                        
                         <button onclick="openCloudModal()" id="sync-status-pill" class="inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 hover:bg-amber-500/20 transition">
                             <span id="sync-status-dot" class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                             <span id="sync-status-text">Local Mode</span>
                         </button>
                     </div>
-                    <p id="current-date-label" class="text-[11px] text-slate-500 dark:text-slate-400">Faithful Stewardship • Spiritual Rhythm &amp; Garmin Biometrics</p>
+                    <p id="current-date-label" class="text-[11px] text-slate-500 dark:text-slate-400">Faithful Stewardship • Spiritual Rhythm • Healthy Body </p>
                 </div>
             </div>
 
@@ -110,7 +110,7 @@
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-semibold">Colossians 2:6–7</span>
                         <span class="text-xs text-stone-400">•</span>
-                        <span class="text-xs text-emerald-300 font-medium">Spirit, Mind &amp; Body Stewardship</span>
+                        <span class="text-xs text-emerald-300 font-medium">Spirit, Soul &amp; Body Stewardship</span>
                     </div>
                     <p class="font-serif text-sm sm:text-base text-stone-100 mt-0.5 italic">
                         “Rooted and built up in Him, strengthened in the faith as you were taught, and overflowing with thankfulness.”
@@ -1152,11 +1152,11 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
             if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey) {
                 pill.className = 'inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition';
                 dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot';
-                txt.textContent = `Supabase Synced (${cloudConfig.userId || 'default'})`;
+                txt.textContent = `Supabase Synced`;
             } else {
                 pill.className = 'inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/25 hover:bg-amber-500/20 transition';
                 dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500';
-                txt.textContent = 'Local + Demo Mode';
+                txt.textContent = 'Demo Mode';
             }
         }
 
