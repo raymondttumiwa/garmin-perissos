@@ -7,6 +7,7 @@ import json
 import time
 import base64
 import tempfile
+from uuid import UUID
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import requests
@@ -20,11 +21,15 @@ GARMIN_EMAIL = os.environ.get("GARMIN_EMAIL", "").strip()
 GARMIN_PASSWORD = os.environ.get("GARMIN_PASSWORD", "").strip()
 GARMIN_TOKEN_B64 = os.environ.get("GARMIN_TOKEN_BASE64", "").strip()
 SYNC_DAYS = int(os.environ.get("SYNC_DAYS", "7"))
-SUPABASE_USER_ID = os.environ.get("SUPABASE_USER_ID", "default").strip() or "default"
+SUPABASE_USER_ID = os.environ.get("SUPABASE_USER_ID", "").strip()
 GARMIN_TIMEZONE = os.environ.get("GARMIN_TIMEZONE", "Asia/Shanghai").strip() or "Asia/Shanghai"
 
 
 def validate_env():
+    try:
+        UUID(SUPABASE_USER_ID)
+    except ValueError as exc:
+        raise ValueError("SUPABASE_USER_ID must be the destination account UUID from the website account settings.") from exc
     if not SUPABASE_URL.startswith("https://") or ".supabase.co" not in SUPABASE_URL:
         raise ValueError(
             f"SUPABASE_URL looks invalid or empty (got: '{RAW_URL}'). "
@@ -73,7 +78,7 @@ def login_garmin() -> Garmin:
 
 
 def upsert_to_supabase(row: dict):
-    endpoint = f"{SUPABASE_URL}/rest/v1/garmin_daily_metrics?on_conflict=date"
+    endpoint = f"{SUPABASE_URL}/rest/v1/garmin_daily_metrics?on_conflict=user_id,date"
     headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",

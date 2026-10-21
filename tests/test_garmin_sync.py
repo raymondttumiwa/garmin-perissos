@@ -18,6 +18,12 @@ with patch.dict(sys.modules, {
 
 
 class MetricsTests(unittest.TestCase):
+    def test_import_requires_an_explicit_account_uuid(self):
+        for user_id in ('', 'default', 'someone-elses-name'):
+            with patch.object(sync, 'SUPABASE_USER_ID', user_id):
+                with self.assertRaisesRegex(ValueError, 'destination account UUID'):
+                    sync.validate_env()
+
     def test_training_readiness_prefers_morning_and_preserves_zero(self):
         garmin = Mock()
         garmin.get_training_readiness.return_value = [
@@ -68,7 +74,7 @@ class MetricsTests(unittest.TestCase):
         row = sync.build_metrics_row('2026-10-21', {'totalSteps': 0}, {}, [])
         with patch.object(sync.requests, 'post', return_value=Mock(ok=True)) as post:
             sync.upsert_to_supabase(row)
-        self.assertTrue(post.call_args.args[0].endswith('?on_conflict=date'))
+        self.assertTrue(post.call_args.args[0].endswith('?on_conflict=user_id,date'))
         self.assertEqual(post.call_args.kwargs['json'], row)
         self.assertIn('missing=default', post.call_args.kwargs['headers']['Prefer'])
         with patch.object(sync.requests, 'post', return_value=Mock(ok=False, status_code=400, text='schema mismatch')):

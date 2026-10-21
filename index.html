@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perissos — Live in Overflow</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="site-config.js"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter, Fraunces (for warm editorial biblical headers) & JetBrains Mono -->
@@ -48,6 +50,39 @@
 </head>
 <body class="bg-stone-100 dark:bg-[#0b101b] text-slate-900 dark:text-stone-100 font-sans min-h-screen transition-colors duration-300 selection:bg-emerald-600 selection:text-white pb-16">
 
+    <section id="public-landing" class="max-w-6xl mx-auto px-5 py-10 sm:py-16 space-y-10">
+        <header class="flex items-center justify-between">
+            <div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-amber-500 flex items-center justify-center text-white"><i data-lucide="sprout" class="w-5 h-5"></i></div><div><p class="font-serif text-xl font-bold">Perissos</p><p class="text-[11px] text-slate-500">Live in Overflow</p></div></div>
+            <button onclick="showAccountGate()" class="px-4 py-2 rounded-xl border border-stone-300 dark:border-slate-700 text-sm font-semibold">Log in</button>
+        </header>
+        <section class="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950 via-[#111c2d] to-slate-950 p-7 sm:p-12 text-stone-100">
+            <div class="max-w-2xl relative z-10"><p class="text-xs uppercase tracking-[0.2em] text-amber-300 font-semibold">Spirit · Soul · Body</p><h1 class="font-serif text-4xl sm:text-6xl font-bold mt-4 leading-tight">A steadier rhythm for a fuller life.</h1><p class="mt-5 text-sm sm:text-base leading-relaxed text-stone-300">Bring prayer, learning, work, and physical wellbeing into one thoughtful daily practice. Build habits at your pace and see your progress over time.</p><div class="flex flex-wrap gap-3 mt-8"><button onclick="showAccountGate(true)" class="px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm">Create your account <span aria-hidden="true">→</span></button><button onclick="showAccountGate()" class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 font-semibold text-sm">Log in</button></div><p class="mt-4 text-[11px] text-stone-400">Your progress is private to your account.</p></div>
+            <div class="absolute -right-16 -bottom-28 w-96 h-96 rounded-full bg-emerald-500/10 blur-3xl"></div>
+        </section>
+        <section class="grid md:grid-cols-3 gap-4">
+            <article class="p-5 rounded-2xl bg-white dark:bg-[#131b2e] border border-amber-500/20"><span class="text-xs font-semibold uppercase tracking-wider text-amber-500">01 · Spirit</span><h2 class="font-serif text-xl font-bold mt-3">Make room for what roots you.</h2><p class="text-sm text-slate-500 mt-2">Track prayer, scripture, gratitude, and the practices that ground your day.</p></article>
+            <article class="p-5 rounded-2xl bg-white dark:bg-[#131b2e] border border-indigo-500/20"><span class="text-xs font-semibold uppercase tracking-wider text-indigo-400">02 · Soul</span><h2 class="font-serif text-xl font-bold mt-3">Give attention to learning and work.</h2><p class="text-sm text-slate-500 mt-2">Choose meaningful personal goals and build a rhythm of focus and growth.</p></article>
+            <article class="p-5 rounded-2xl bg-white dark:bg-[#131b2e] border border-emerald-500/20"><span class="text-xs font-semibold uppercase tracking-wider text-emerald-500">03 · Body</span><h2 class="font-serif text-xl font-bold mt-3">Care for the body you live in.</h2><p class="text-sm text-slate-500 mt-2">Connect Garmin metrics and activity logs to notice your movement, rest, and recovery.</p></article>
+        </section>
+        <section class="grid lg:grid-cols-[1.2fr_.8fr] gap-5 items-stretch">
+            <article class="p-6 rounded-2xl bg-white dark:bg-[#131b2e] border border-stone-200 dark:border-slate-800"><p class="text-xs font-semibold uppercase tracking-wider text-emerald-500">A clear view of today</p><h2 class="font-serif text-2xl font-bold mt-2">Small steps, seen together.</h2><div class="grid grid-cols-3 gap-2 mt-5"><div class="p-3 rounded-xl bg-amber-500/10"><span class="text-[10px] uppercase text-amber-500">Spirit</span><p class="font-mono text-xl font-bold mt-1">● ● ○</p></div><div class="p-3 rounded-xl bg-indigo-500/10"><span class="text-[10px] uppercase text-indigo-400">Soul</span><p class="font-mono text-xl font-bold mt-1">● ○ ○</p></div><div class="p-3 rounded-xl bg-emerald-500/10"><span class="text-[10px] uppercase text-emerald-500">Body</span><p class="font-mono text-xl font-bold mt-1">● ● ○</p></div></div><div class="mt-4 p-4 rounded-xl bg-stone-50 dark:bg-slate-900"><div class="flex justify-between text-xs"><span class="font-semibold">A week of steady practice</span><span class="text-slate-500">Sample preview</span></div><div class="grid grid-cols-7 gap-2 mt-3"><div class="rounded-lg p-2 text-center bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">68%</div><div class="rounded-lg p-2 text-center bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">82%</div><div class="rounded-lg p-2 text-center bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">48%</div><div class="rounded-lg p-2 text-center bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">92%</div><div class="rounded-lg p-2 text-center bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">74%</div><div class="rounded-lg p-2 text-center bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">86%</div><div class="rounded-lg p-2 text-center bg-stone-200 dark:bg-slate-800">—</div></div></div></article>
+            <article class="p-6 rounded-2xl bg-gradient-to-br from-emerald-950/90 to-slate-900 text-stone-100 border border-emerald-500/20 flex flex-col justify-between"><div><p class="text-xs font-semibold uppercase tracking-wider text-amber-300">Built for your own journey</p><h2 class="font-serif text-2xl font-bold mt-3">Your goals. Your pace. Your progress.</h2><p class="text-sm text-stone-300 mt-3">Monthly and yearly views help you reflect on the patterns that matter, without losing sight of the daily choices that shape them.</p></div><button onclick="showAccountGate(true)" class="mt-6 self-start px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-sm">Get started</button></article>
+        </section>
+        <footer class="text-center text-xs text-slate-500">Perissos · Faithful stewardship · Spiritual rhythm · Healthy body</footer>
+    </section>
+    <section id="account-gate" hidden class="max-w-md mx-auto mt-12 p-6 bg-white dark:bg-[#131b2e] rounded-2xl border border-stone-200 dark:border-slate-800">
+        <button onclick="showPublicLanding()" class="text-xs text-emerald-500 hover:underline">← Back to welcome page</button>
+        <h1 class="font-serif text-2xl font-bold">Welcome to Perissos</h1>
+        <p class="text-sm text-slate-500 mt-2">Your own Spirit, Soul &amp; Body progress.</p>
+        <form onsubmit="submitAccount(event)" class="mt-6 space-y-4">
+            <label class="block text-sm">Username<input id="account-username" autocomplete="username" required pattern="[A-Za-z0-9_]{3,30}" minlength="3" maxlength="30" title="3–30 letters, numbers or underscores" class="block w-full mt-1 p-3 rounded-xl bg-stone-100 dark:bg-slate-900 border border-slate-500/30"></label>
+            <label class="block text-sm">Password<input id="account-password" type="password" autocomplete="current-password" required minlength="10" class="block w-full mt-1 p-3 rounded-xl bg-stone-100 dark:bg-slate-900 border border-slate-500/30"></label>
+            <p class="text-xs text-slate-500">Usernames use 3–30 letters, numbers or underscores. Passwords need at least 10 characters. These accounts are only for this website. Password recovery requires contacting the site owner.</p>
+            <p id="account-message" role="status" aria-live="polite" class="text-sm text-amber-600 dark:text-amber-400">Loading accounts…</p>
+            <div class="flex gap-3"><button id="account-login" type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 text-white disabled:opacity-50">Log in</button><button id="account-register" type="button" onclick="submitAccount(event, true)" class="px-4 py-2 rounded-xl border border-slate-500/30 disabled:opacity-50">Create account</button></div>
+        </form>
+    </section>
+    <div id="authenticated-app" hidden>
     <!-- Top Navigation Bar -->
     <header class="sticky top-0 z-30 backdrop-blur-xl bg-white/85 dark:bg-[#0f1624]/85 border-b border-stone-200/80 dark:border-slate-800/80">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
@@ -69,6 +104,7 @@
                 </div>
             </div>
 
+            <div class="flex items-center gap-2 text-xs"><span id="account-name"></span><button onclick="signOutAccount()" class="px-3 py-2 rounded-xl border border-slate-500/30">Log out</button></div>
             <!-- Action Buttons -->
             <div class="flex items-center gap-2">
                 <button onclick="triggerGarminSyncNow()" id="btn-sync-now" title="Sync Garmin biometrics & manual devotions with Supabase" class="px-3 py-2 rounded-xl bg-stone-100 dark:bg-slate-800/90 hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/30 border border-stone-200 dark:border-slate-700/80 text-xs font-semibold transition flex items-center gap-1.5">
@@ -675,92 +711,24 @@
         </div>
     </div>
 
-    <!-- MODAL 4: Pipeline A Cloud Configuration (Supabase + GitHub Actions Trigger) -->
-    <div id="cloud-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm">
-        <div class="bg-white dark:bg-[#131b2e] border border-stone-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-slate-800">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
-                        <i data-lucide="cloud-cog" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-serif font-bold text-base">Pipeline A: Hybrid Cloud &amp; Garmin Sync</h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Syncs both manual devotions &amp; Garmin biometrics via Supabase</p>
-                    </div>
-                </div>
-                <button onclick="closeCloudModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-stone-100 dark:hover:bg-slate-800">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <form onsubmit="handleSaveCloudConfig(event)" class="space-y-4 mt-4">
-                <div class="p-3.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-xs text-slate-600 dark:text-slate-300 space-y-1.5">
-                    <p class="font-bold text-emerald-600 dark:text-emerald-400">How Hybrid Sync Works Across Your Devices:</p>
-                    <p>1. Your GitHub Action runs <code class="font-mono">garmin_sync.py</code> hourly to update watch metrics (<code class="font-mono">steps</code>, <code class="font-mono">sleep_hours</code>, <code class="font-mono">stress_avg</code>) in <code class="font-mono">garmin_daily_metrics</code>.</p>
-                    <p>2. When you check off a <strong>Morning Devotion</strong> or manual habit on your phone or laptop, it saves into the <code class="font-mono">manual_logs</code> JSONB column for that date so both worlds stay in sync!</p>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Supabase Project URL</label>
-                    <input id="cfg-supabase-url" type="url" placeholder="https://xyzcompany.supabase.co"
-                        class="w-full px-3.5 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-mono">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Supabase Anon Public Key</label>
-                    <input id="cfg-supabase-key" type="password" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                        class="w-full px-3.5 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-mono">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Personal Sync Key / User ID (Multi-User Separation)</label>
-                    <input id="cfg-user-id" type="text" placeholder="default" value="default"
-                        class="w-full px-3.5 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-mono">
-                </div>
-
-                <details class="p-3 rounded-xl bg-stone-50 dark:bg-slate-900/90 border border-stone-200 dark:border-slate-800 text-xs">
-                    <summary class="font-semibold cursor-pointer text-emerald-500">View SQL Upgrade for Manual Devotions (`manual_logs` column)</summary>
-                    <pre class="mt-2 p-2.5 rounded-lg bg-slate-950 text-emerald-300 font-mono text-[11px] overflow-x-auto">alter table public.garmin_daily_metrics
-add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
-                </details>
-
-                <div class="pt-2 border-t border-stone-200 dark:border-slate-800">
-                    <p class="text-xs font-bold text-slate-400 mb-2">Optional: Trigger GitHub Action from Dashboard</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[11px] text-slate-400 mb-1">GitHub Repo (<code class="font-mono">owner/repo</code>)</label>
-                            <input id="cfg-gh-repo" type="text" placeholder="alex/rooted-and-built"
-                                class="w-full px-3 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-mono">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] text-slate-400 mb-1">GitHub Fine-Grained PAT</label>
-                            <input id="cfg-gh-pat" type="password" placeholder="github_pat_..."
-                                class="w-full px-3 py-2 rounded-xl bg-stone-50 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs font-mono">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-3 flex items-center justify-between gap-2 border-t border-stone-200 dark:border-slate-800">
-                    <button type="button" onclick="disconnectCloud()" class="px-3 py-2 rounded-xl text-xs font-semibold text-rose-500 hover:bg-rose-500/10">Disconnect</button>
-                    <div class="flex gap-2">
-                        <button type="button" onclick="closeCloudModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:bg-stone-100 dark:hover:bg-slate-800">Close</button>
-                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/25">Save &amp; Sync Now</button>
-                    </div>
-                </div>
-            </form>
+    <div id="account-details" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/75">
+        <div class="max-w-lg w-full p-6 rounded-2xl bg-white dark:bg-slate-900 space-y-4">
+            <h2 class="font-serif text-xl font-bold">Your account</h2>
+            <p class="text-sm">Your goals and progress are saved privately to your account.</p>
+            <p class="text-xs text-slate-500">Account ID for Garmin sync:</p><p id="account-id" class="text-xs font-mono break-all select-all"></p>
+            <p class="text-xs text-slate-500">Garmin automatic imports require a separate server-side setup for your account. Sync Cloud refreshes data already imported.</p>
+            <button onclick="closeCloudModal()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl">Close</button>
         </div>
     </div>
-
-    <!-- Toast Container -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+    </div>
     <script>
         /********************************************************************
          * 1. METRIC DEFINITIONS & STORAGE KEYS
          ********************************************************************/
         const STORAGE_TELEMETRY_KEY = 'rooted_built_telemetry_v3';
         const STORAGE_RULES_KEY = 'rooted_built_hybrid_goals_v3';
-        const STORAGE_CLOUD_KEY = 'rooted_built_cloud_config_v3';
 
         const METRIC_CATALOG = {
             steps: {
@@ -983,60 +951,16 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
             ];
         }
 
-        function getDefaultTelemetry() {
-            const samples = [
-                {
-                    steps: 11240, sleep_hours: 7.8, sleep_score: 84, active_minutes: 55, body_battery: 88, resting_hr: 51, stress_avg: 26, hydration_ml: 2700,
-                    manual_logs: { g_devotion: 25, g_scripture: true, g_examen: true, g_fast: true },
-                    activities: [{ name: 'Morning Prayer Walk & Zone 2 Run', duration_min: 42, avg_hr: 140, calories: 460, type: 'running' }]
-                },
-                {
-                    steps: 9420, sleep_hours: 7.1, sleep_score: 76, active_minutes: 35, body_battery: 79, resting_hr: 53, stress_avg: 31, hydration_ml: 2400,
-                    manual_logs: { g_devotion: 20, g_scripture: true, g_examen: false, g_fast: true },
-                    activities: [{ name: 'Strength & Functional Stewardship', duration_min: 45, avg_hr: 118, calories: 310, type: 'strength' }]
-                },
-                {
-                    steps: 12890, sleep_hours: 8.1, sleep_score: 89, active_minutes: 72, body_battery: 94, resting_hr: 49, stress_avg: 24, hydration_ml: 3100,
-                    manual_logs: { g_devotion: 30, g_scripture: true, g_examen: true, g_fast: true },
-                    activities: [{ name: 'Tempo Endurance Run', duration_min: 50, avg_hr: 156, calories: 610, type: 'running' }, { name: 'Evening Stretching', duration_min: 20, avg_hr: 92, calories: 85, type: 'mobility' }]
-                },
-                {
-                    steps: 8150, sleep_hours: 6.8, sleep_score: 72, active_minutes: 22, body_battery: 68, resting_hr: 55, stress_avg: 37, hydration_ml: 2100,
-                    manual_logs: { g_devotion: 15, g_scripture: true, g_examen: true, g_fast: false },
-                    activities: [{ name: 'Outdoor Walk', duration_min: 25, avg_hr: 98, calories: 140, type: 'walking' }]
-                },
-                {
-                    steps: 10540, sleep_hours: 7.6, sleep_score: 82, active_minutes: 48, body_battery: 85, resting_hr: 52, stress_avg: 28, hydration_ml: 2600,
-                    manual_logs: { g_devotion: 20, g_scripture: true, g_examen: true, g_fast: true },
-                    activities: [{ name: 'Indoor Cycling Session', duration_min: 48, avg_hr: 139, calories: 510, type: 'cycling' }]
-                },
-                {
-                    steps: 13400, sleep_hours: 8.3, sleep_score: 91, active_minutes: 80, body_battery: 95, resting_hr: 48, stress_avg: 23, hydration_ml: 3000,
-                    manual_logs: { g_devotion: 30, g_scripture: true, g_examen: true, g_fast: true },
-                    activities: [{ name: 'Saturday Long Trail Run', duration_min: 75, avg_hr: 145, calories: 830, type: 'running' }]
-                },
-                {
-                    steps: 10860, sleep_hours: 7.9, sleep_score: 86, active_minutes: 62, body_battery: 90, resting_hr: 50, stress_avg: 25, hydration_ml: 2800,
-                    manual_logs: { g_devotion: 25, g_scripture: true, g_examen: false, g_fast: true },
-                    activities: [{ name: 'Morning Zone 2 Run', duration_min: 44, avg_hr: 141, calories: 495, type: 'running' }]
-                }
-            ];
-
-            const map = {};
-            weekDays.forEach((d, idx) => {
-                map[d.iso] = { date: d.iso, ...samples[idx] };
-            });
-            return map;
-        }
-
-        let telemetryByDate = loadTelemetry();
-        let rules = loadRules();
-        let cloudConfig = loadCloudConfig();
+        let accountUser = null;
+        let accountClient = null;
+        let telemetryByDate = {};
+        let rules = getDefaultRules();
+        let cloudConfig = { supabaseUrl: '', supabaseKey: '', userId: '' };
 
         function loadTelemetry() {
             try {
-                const raw = localStorage.getItem(STORAGE_TELEMETRY_KEY);
-                if (!raw) return getDefaultTelemetry();
+                const raw = localStorage.getItem(accountStorageKey(STORAGE_TELEMETRY_KEY));
+                if (!raw) return {};
                 const parsed = JSON.parse(raw);
                 weekDays.forEach(d => {
                     if (!parsed[d.iso]) parsed[d.iso] = { date: d.iso, manual_logs: {} };
@@ -1044,20 +968,20 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
                 });
                 return parsed;
             } catch (e) {
-                return getDefaultTelemetry();
+                return {};
             }
         }
 
         function saveTelemetry() {
-            try { localStorage.setItem(STORAGE_TELEMETRY_KEY, JSON.stringify(telemetryByDate)); } catch (e) {}
+            try { localStorage.setItem(accountStorageKey(STORAGE_TELEMETRY_KEY), JSON.stringify(telemetryByDate)); } catch (e) {}
         }
 
         function loadRules() {
             try {
-                const raw = localStorage.getItem(STORAGE_RULES_KEY);
+                const raw = localStorage.getItem(accountStorageKey(STORAGE_RULES_KEY));
                 if (!raw) return getDefaultRules();
                 const parsed = JSON.parse(raw);
-                if (!Array.isArray(parsed) || parsed.length === 0) return getDefaultRules();
+                if (!Array.isArray(parsed)) return getDefaultRules();
                 return parsed.map(rule => ({
                     ...rule,
                     category: rule.goalType === 'sensor' || rule.category === 'Body'
@@ -1070,20 +994,9 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
         }
 
         function saveRules() {
-            try { localStorage.setItem(STORAGE_RULES_KEY, JSON.stringify(rules)); } catch (e) {}
-        }
-
-        function loadCloudConfig() {
-            try {
-                const raw = localStorage.getItem(STORAGE_CLOUD_KEY);
-                return raw ? JSON.parse(raw) : { supabaseUrl: '', supabaseKey: '', userId: 'default', ghRepo: '', ghPat: '', lastSync: null };
-            } catch (e) {
-                return { supabaseUrl: '', supabaseKey: '', userId: 'default', ghRepo: '', ghPat: '', lastSync: null };
-            }
-        }
-
-        function saveCloudConfig() {
-            try { localStorage.setItem(STORAGE_CLOUD_KEY, JSON.stringify(cloudConfig)); } catch (e) {}
+            if (!accountUser) return;
+            void saveAccountGoals();
+            try { localStorage.setItem(accountStorageKey(STORAGE_RULES_KEY), JSON.stringify(rules)); } catch (e) {}
         }
 
         /********************************************************************
@@ -1263,7 +1176,7 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
             } else {
                 pill.className = 'inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/25 hover:bg-amber-500/20 transition';
                 dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500';
-                txt.textContent = 'Demo Mode';
+                txt.textContent = 'Offline';
             }
         }
 
@@ -1941,7 +1854,7 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
             renderAll();
 
             if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey) {
-                await pushDayTelemetryToSupabase(updated);
+                await pushDayTelemetryToSupabase(updated, true);
             }
 
             showToast(`Updated Garmin sensor telemetry for ${iso}`, 'emerald');
@@ -1957,47 +1870,18 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
          * 8. PIPELINE A: SUPABASE HYBRID SYNC (GARMIN + MANUAL LOGS)
          ********************************************************************/
         function openCloudModal() {
-            document.getElementById('cfg-supabase-url').value = cloudConfig.supabaseUrl || '';
-            document.getElementById('cfg-supabase-key').value = cloudConfig.supabaseKey || '';
-            document.getElementById('cfg-user-id').value = cloudConfig.userId || 'default';
-            document.getElementById('cfg-gh-repo').value = cloudConfig.ghRepo || '';
-            document.getElementById('cfg-gh-pat').value = cloudConfig.ghPat || '';
-
-            const modal = document.getElementById('cloud-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            document.getElementById('account-id').textContent = accountUser?.id || '';
+            document.getElementById('account-details').classList.remove('hidden');
+            document.getElementById('account-details').classList.add('flex');
         }
-
         function closeCloudModal() {
-            const modal = document.getElementById('cloud-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        async function handleSaveCloudConfig(e) {
-            e.preventDefault();
-            cloudConfig.supabaseUrl = document.getElementById('cfg-supabase-url').value.trim().replace(/\/$/, '');
-            cloudConfig.supabaseKey = document.getElementById('cfg-supabase-key').value.trim();
-            cloudConfig.userId = document.getElementById('cfg-user-id').value.trim() || 'default';
-            cloudConfig.ghRepo = document.getElementById('cfg-gh-repo').value.trim();
-            cloudConfig.ghPat = document.getElementById('cfg-gh-pat').value.trim();
-
-            saveCloudConfig();
-            closeCloudModal();
-            await fetchFromSupabase();
-            renderAll();
-        }
-
-        function disconnectCloud() {
-            cloudConfig = { supabaseUrl: '', supabaseKey: '', userId: 'default', ghRepo: '', ghPat: '', lastSync: null };
-            saveCloudConfig();
-            closeCloudModal();
-            renderAll();
-            showToast('Disconnected from Supabase Cloud', 'amber');
+            document.getElementById('account-details').classList.add('hidden');
+            document.getElementById('account-details').classList.remove('flex');
         }
 
         async function fetchFromSupabase() {
-            if (!cloudConfig.supabaseUrl || !cloudConfig.supabaseKey) return false;
+            if (!accountUser) return false;
+            const requestUserId = accountUser.id;
 
             try {
                 const startIso = formatLocalDate(new Date(Math.min(new Date(weekDays[0].iso + 'T12:00:00').getTime(), new Date(progressAnchor.getFullYear(), 0, 1).getTime())));
@@ -2005,12 +1889,13 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
                 const res = await fetch(url, {
                     headers: {
                         'apikey': cloudConfig.supabaseKey,
-                        'Authorization': `Bearer ${cloudConfig.supabaseKey}`
+                        'Authorization': `Bearer ${await accountAccessToken()}`
                     }
                 });
 
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const rows = await res.json();
+                if (accountUser?.id !== requestUserId) return false;
 
                 if (Array.isArray(rows) && rows.length > 0) {
                     rows.forEach(row => {
@@ -2035,7 +1920,7 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
                 }
 
                 cloudConfig.lastSync = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                saveCloudConfig();
+
                 showToast(`Synced ${rows.length} day(s) of devotions & Garmin data`, 'emerald');
                 return true;
             } catch (err) {
@@ -2057,69 +1942,32 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
             return [];
         }
 
-        async function pushDayTelemetryToSupabase(dayPayload) {
-            if (!cloudConfig.supabaseUrl || !cloudConfig.supabaseKey) return;
+        async function pushDayTelemetryToSupabase(dayPayload, includeSensors = false) {
+            if (!accountUser) return;
             try {
-                const url = `${cloudConfig.supabaseUrl}/rest/v1/garmin_daily_metrics`;
-                await fetch(url, {
+                // Manual check-ins must never overwrite newer Garmin workouts or measurements.
+                const payload = { user_id: accountUser.id, date: dayPayload.date, manual_logs: dayPayload.manual_logs || {} };
+                if (includeSensors) {
+                    for (const field of ['steps', 'sleep_hours', 'sleep_score', 'active_minutes', 'body_battery', 'resting_hr', 'stress_avg', 'hydration_ml']) {
+                        if (dayPayload[field] !== undefined) payload[field] = dayPayload[field];
+                    }
+                }
+                const res = await fetch(`${cloudConfig.supabaseUrl}/rest/v1/garmin_daily_metrics?on_conflict=user_id,date`, {
                     method: 'POST',
                     headers: {
-                        'apikey': cloudConfig.supabaseKey,
-                        'Authorization': `Bearer ${cloudConfig.supabaseKey}`,
+                        apikey: cloudConfig.supabaseKey,
+                        Authorization: `Bearer ${await accountAccessToken()}`,
                         'Content-Type': 'application/json',
-                        'Prefer': 'resolution=merge-duplicates'
+                        Prefer: 'resolution=merge-duplicates'
                     },
-                    body: JSON.stringify({
-                        user_id: cloudConfig.userId || 'default',
-                        date: dayPayload.date,
-                        steps: dayPayload.steps ?? 0,
-                        sleep_hours: dayPayload.sleep_hours ?? 0,
-                        sleep_score: dayPayload.sleep_score ?? 0,
-                        active_minutes: dayPayload.active_minutes ?? 0,
-                        body_battery: dayPayload.body_battery ?? 0,
-                        resting_hr: dayPayload.resting_hr ?? 0,
-                        stress_avg: dayPayload.stress_avg ?? 0,
-                        hydration_ml: dayPayload.hydration_ml ?? 0,
-                        manual_logs: dayPayload.manual_logs || {},
-                        activities: dayPayload.activities || []
-                    })
+                    body: JSON.stringify(payload)
                 });
-            } catch (e) {}
+                if (!res.ok) throw new Error('Cloud save failed');
+            } catch (e) { showToast('Saved on this device; cloud save failed. Please retry.', 'amber'); }
         }
 
         async function triggerGarminSyncNow() {
-            const icon = document.getElementById('sync-now-icon');
-            if (icon) icon.classList.add('animate-spin');
-
-            if (cloudConfig.ghRepo && cloudConfig.ghPat) {
-                try {
-                    const ghUrl = `https://api.github.com/repos/${cloudConfig.ghRepo}/actions/workflows/garmin_sync.yml/dispatches`;
-                    const resp = await fetch(ghUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/vnd.github+json',
-                            'Authorization': `Bearer ${cloudConfig.ghPat}`
-                        },
-                        body: JSON.stringify({ ref: 'main' })
-                    });
-                    if (resp.ok) {
-                        showToast('Triggered GitHub Action garmin_sync.yml!', 'emerald');
-                    }
-                } catch (e) {
-                    showToast('Could not trigger GitHub Action; check Repo/PAT', 'amber');
-                }
-            }
-
-            if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey) {
-                await fetchFromSupabase();
-                renderAll();
-            } else {
-                showToast('Local state refreshed (Connect Supabase in Cloud settings for cross-device sync)', 'emerald');
-            }
-
-            setTimeout(() => {
-                if (icon) icon.classList.remove('animate-spin');
-            }, 600);
+            if (await fetchFromSupabase()) renderAll();
         }
 
         /********************************************************************
@@ -2159,13 +2007,8 @@ add column if not exists manual_logs jsonb default '{}'::jsonb;</pre>
             }
         });
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            renderAll();
-            if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey) {
-                await fetchFromSupabase();
-                renderAll();
-            }
-        });
+        window.addEventListener('DOMContentLoaded', () => initializeAccounts());
     </script>
+    <script src="accounts.js"></script>
 </body>
 </html>
